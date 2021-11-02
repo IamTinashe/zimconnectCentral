@@ -1,0 +1,44 @@
+{
+  "name": "zimconnect",
+  "version": "1.0.0",
+  "description": "Zimworx Project",
+  "author": "Zimworx",
+  "private": true,
+  "main": "index.js",
+  "license": "MIT",
+  "engines": {
+    "node": ">=8",
+    "yarn": "*"
+  },
+  "scripts": {
+    "dev": "nodemon ./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:danielfsousa/express-rest-es2017-boilerplate.git"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "body-parser": "^1.17.0",
+    "cors": "^2.8.3",
+    "cross-env": "^7.0.3",
+    "dotenv-safe": "^8.2.0",
+    "email-templates": "^6.0.3",
+    "express": "^4.16.3",
+    "express-session": "^1.17.1",
+    "express-validation": "^1.0.2",
+    "http": "0.0.1-security",
+    "http-status": "^1.0.1",
+    "https": "^1.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.4",
+    "moment-timezone": "^0.5.13",
+    "nodemailer": "^6.3.1",
+    "passport": "^0.4.0",
+    "passport-http-bearer": "^1.0.1",
+    "passport-jwt": "4.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
+}
