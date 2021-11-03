@@ -6,9 +6,21 @@ module.exports = class Services {
   
   constructor() { }
 
-  compute(){
+  async compute(){
     let resumes = new Resumes();
-    let compute = new Compute(resumes.getResumes());
-    return compute.filterByGoodName();
+    let data = await resumes.getResumes()
+
+    let compute = new Compute(data);
+    data = await compute.filterByGoodName();
+    data = await compute.getEducation();
+    data = await compute.getProfession();
+    data = await compute.filterEmpty();
+    data = await compute.filterEmpty();
+    data = await compute.filterEmpty();
+    data = await compute.filterEmpty();
+    data = await compute.filterEmpty();
+    //data = await compute.getYearsOfExperience();
+
+    return data;
   }
 }
