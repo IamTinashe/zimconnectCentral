@@ -14,11 +14,7 @@ module.exports = class Services {
     data = await compute.filterByGoodName();
     data = await compute.getEducation();
     data = await compute.getProfession();
-    data = await compute.filterEmpty();
-    data = await compute.filterEmpty();
-    data = await compute.filterEmpty();
-    data = await compute.filterEmpty();
-    data = await compute.filterEmpty();
+    data = await compute.filterEducation();
     //data = await compute.getYearsOfExperience();
 
     return data;

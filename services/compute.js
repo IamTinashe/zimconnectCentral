@@ -99,15 +99,8 @@ module.exports = class Compute {
     return this.resumes;
   }
 
-  async filterEmpty(){
-    let index = 0;
-    for (index in this.resumes){
-      if (this.resumes[index].education.length < 1) {
-        this.resumes.splice(index, 1);
-        index--;
-      }
-      if(index > 0) index--;
-    }
+  async filterEducation(){
+    this.resumes = this.resumes.filter(object => object.education.length != 0);
     return this.resumes;
   }
 }
