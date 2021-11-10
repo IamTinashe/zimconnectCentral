@@ -1,5 +1,6 @@
 'use strict';
 const Users = require('./users');
+const Resumes = require('./resumes');
 const mongoose = require('mongoose');
 const username = 'admin';
 const password = 'zimconnect';
@@ -19,5 +20,9 @@ module.exports = class Models {
 
   async getUsers(){
     return await Users.find({}); 
+  }
+
+  async getResumes(){
+    return await Resumes.find({}); 
   }
 }
