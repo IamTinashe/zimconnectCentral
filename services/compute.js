@@ -103,4 +103,9 @@ module.exports = class Compute {
     this.resumes = this.resumes.filter(object => object.education.length != 0);
     return this.resumes;
   }
+
+  async filterSkills(){
+    this.resumes = this.resumes.filter(object => object.skills.length != 0);
+    return this.resumes;
+  }
 }

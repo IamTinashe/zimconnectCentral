@@ -8,10 +8,9 @@ exports.all = app.get('/all', async (req, res) => {
   let resumes = new Resumes();
   try {
     let data = await resumes.getResumes();
-    return res.send(data);
+    return res.status(200).json(data);
   } catch (error) {
-    res.status(500);
-    return res.send(error);
+    return res.status(500).json(error);
   }
 });
 
@@ -19,9 +18,9 @@ exports.all = app.get('/all', async (req, res) => {
 exports.computed = app.get('/computed', async (req, res) => {
   let services = new Services();
   try {
-    return res.send(await services.compute());
+    return res.status(200).json(await services.compute());
   } catch (error) {
     res.status(500);
-    return res.send(error);
+    return res.status(500).json(error);
   }
 });
