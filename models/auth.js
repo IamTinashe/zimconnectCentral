@@ -3,18 +3,15 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 
-let userSchema = new Schema({
+let authSchema = new Schema({
   username: String,
-  fullname: String,
-  company: String,
   email: String,
   password: String,
   verified: Boolean,
   verificationCode: String,
   confirmed: Boolean,
-  confirmationCode: String,
-  role: String
+  confirmationCode: String
 });
 
-const User = mongoose.model('users', userSchema);
-module.exports = User;
+const Auth = mongoose.model('auth', authSchema);
+module.exports = Auth;
