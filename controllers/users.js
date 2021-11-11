@@ -1,6 +1,7 @@
 'use strict';
 const express = require('express');
 const Models = require('../models');
+const Mails = require('../mails')
 const app = express();
 
 
@@ -18,11 +19,12 @@ exports.all = app.get('/all', async (req, res) => {
 
 exports.create = app.post('/create', async (req, res) => {
   let models = new Models();
+  let mails = new Mails();
   try {
     let data = await models.createAuth(req.body);
-    if(data.hasOwnProperty('user') && data.user == false){
+    if (data.hasOwnProperty('user') && data.user == false) {
       return res.status(401).json(data.message);
-    }else{
+    } else {
       let user = {
         username: req.body.username,
         userAuthID: data._id.toString(),
@@ -32,10 +34,11 @@ exports.create = app.post('/create', async (req, res) => {
         role: req.body.role
       }
       data = await models.createUser(user);
-      if(data.hasOwnProperty('user') && data.user == false){
+      if (data.hasOwnProperty('user') && data.user == false) {
         return res.status(202).json(data.message);
-      }else{
-        return await res.status(200).json(data);
+      } else {
+        await mails.accountCreated(data);
+        return res.status(200).json(data);
       }
     }
   } catch (error) {
