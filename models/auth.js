@@ -5,12 +5,11 @@ const Schema = mongoose.Schema;
 
 let authSchema = new Schema({
   username: String,
-  email: String,
+  email: { type: String, lowercase: true, trim: true },
   password: String,
-  verified: Boolean,
-  verificationCode: String,
+  active: Boolean,
   confirmed: Boolean,
-  confirmationCode: String
+  confirmationCode: Number
 });
 
 const Auth = mongoose.model('auth', authSchema);

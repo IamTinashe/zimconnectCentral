@@ -5,15 +5,11 @@ const Schema = mongoose.Schema;
 
 let userSchema = new Schema({
   username: String,
+  userAuthID: { type: String, required: true },
   fullname: String,
   company: String,
-  email: String,
-  password: String,
-  verified: Boolean,
-  verificationCode: String,
-  confirmed: Boolean,
-  confirmationCode: String,
-  role: String
+  email: { type: String, lowercase: true, trim: true },
+  role: { type: String, lowercase: true, trim: true }
 });
 
 const User = mongoose.model('users', userSchema);
