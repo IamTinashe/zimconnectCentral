@@ -4,9 +4,9 @@ const Schema = mongoose.Schema;
 
 
 let authSchema = new Schema({
-  username: String,
+  username: { type: String, required: true },
   email: { type: String, lowercase: true, trim: true },
-  password: String,
+  password: { type: String, required: true },
   active: Boolean,
   confirmed: Boolean,
   confirmationCode: Number
