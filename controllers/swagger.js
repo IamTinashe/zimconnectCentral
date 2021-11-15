@@ -8,21 +8,22 @@ const swaggerOptions = {
   swaggerDefinition: {
     info: {
       title: 'Zimconnect Endpoints',
-      version: '1.0.0'
+      version: '1.0.0',
+      contact: {
+        name: "API Support",
+        url: "https://www.zimconnect.org/contact",
+        email: "tinashe.zvihwati@zimworx.com",
+      },
     }
   },
-  apis: ['./controllers/health.js'],
+  servers: [
+    {
+      url: "http://localhost:3000",
+      description: "Zimconnect API Documentation",
+    },
+  ],
+  apis: ['./controllers/health.js', './controllers/users.js', './controllers/resumes.js'],
 };
-
-/**
- * @swagger
- * /health:
- *    get:
- *      description: Get health
- *      responses:
- *        200:
- *          description: Success
- */
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/', swaggerUI.serve, swaggerUI.setup(swaggerDocs));

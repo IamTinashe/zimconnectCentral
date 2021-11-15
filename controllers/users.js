@@ -6,7 +6,21 @@ const Mails = require('../mails');
 
 
 
-
+/**
+ * @swagger
+ * /users/all:
+ *   get:
+ *     tags:
+ *       - Users
+ *     description: Gets all users
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: User successfully created and email sent
+ *       500:
+ *         description: Internal Server Error
+ */
 router.get('/all', async (req, res) => {
   let models = new Models();
   try {
@@ -17,6 +31,31 @@ router.get('/all', async (req, res) => {
   }
 });
 
+
+/**
+ * @swagger
+ * /users/create:
+ *   post:
+ *     tags:
+ *       - Users
+ *     description: Creates a new user
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: user
+ *         description: User object
+ *         in: body
+ *         required: true
+ *     responses:
+ *       201:
+ *         description: User successfully created and email sent
+ *       202:
+ *         description: User created but email not sent
+ *       401:
+ *         description: Unauthorized to create user
+ *       500:
+ *         description: Internal Server Error
+ */
 router.post('/create', async (req, res) => {
   let models = new Models();
   let mails = new Mails();
@@ -38,7 +77,7 @@ router.post('/create', async (req, res) => {
         return res.status(202).json(data.message);
       } else {
         await mails.accountCreated(data);
-        return res.status(200).json(data);
+        return res.status(201).json(data);
       }
     }
   } catch (error) {
@@ -46,11 +85,33 @@ router.post('/create', async (req, res) => {
   }
 });
 
+
+
+/**
+ * @swagger
+ * /users/delete:
+ *   delete:
+ *     tags:
+ *       - Users
+ *     description: Deletes a User
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: user
+ *         description: User object
+ *         in: body
+ *         required: true
+ *     responses:
+ *       201:
+ *         description: User successfully deleted
+ *       500:
+ *         description: Internal Server Error
+ */
 router.delete('/delete', async (req, res) => {
   let models = new Models();
   try {
     let data = await models.deleteUser(req.body);
-    return await res.status(200).json(data);
+    return await res.status(201).json(data);
   } catch (error) {
     return res.status(500).json(error);
   }

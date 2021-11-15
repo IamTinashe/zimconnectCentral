@@ -19,6 +19,6 @@ app.use(bodyParser.urlencoded({
 app.use('/', Health);
 app.use('/resumes', Resumes);
 app.use('/users', Users);
-app.use('/swagger', Swagger);
+app.use('/swagger-ui', Swagger);
 
 module.exports = app;
