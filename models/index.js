@@ -23,7 +23,11 @@ module.exports = class Models {
   constructor() { }
 
   async getUsers(){
-    return await Users.find({}); 
+    try {
+      return await Users.find({}); 
+    }catch(error){
+      return error
+    }
   }
 
   async createAuth(body){
@@ -89,6 +93,70 @@ module.exports = class Models {
       }
     } catch (error) {
       return error;
+    }
+  }
+
+  async authenticate(body){
+    try {
+      let user = await Auth.findOne({ email: body.email });
+      if(user == null){
+        return { user: false, message: 'User does not exist in the authentication table', status: 404}
+      } else if(user.password != body.password) {
+        return { user: false, message: 'Unauthorized. Password incorrect', status: 401}
+      }else{
+        user = await Users.findOne({ email: body.email });
+        if(user == null){
+          return { user: false, message: 'User does not exist in the users table', status: 404}
+        }else{
+          return user;
+        }
+      }
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async confirm(body){
+    try {
+      let user = await Auth.findOne({ email: body.email });
+      if(user == null){
+        return { user: false, message: 'User does not exist in the authentication table', status: 404}
+      } else if(user.password != body.password) {
+        return { user: false, message: 'Unauthorized. Password incorrect', status: 401}
+      }else{
+        user = await Users.findOne({ email: body.email });
+        if(user == null){
+          return { user: false, message: 'User does not exist in the users table', status: 404}
+        }else{
+          return user;
+        }
+      }
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async getUser(type, param){
+    try{
+      if(type == 'id'){
+        return await Users.findOne({ _id: param });
+      }else if(type == 'email'){
+        return await Users.findOne({ email: param });
+      }else if(type == 'username'){
+        return await Users.findOne({ username: param });
+      }else{
+        return { user: false, message: 'User does not exist in the users table', status: 404}
+      }
+    }catch(error){
+      return error;
+    }
+  }
+
+  async getAuth(){
+    try {
+      return await Auth.find({}); 
+    }catch(error){
+      return error
     }
   }
 

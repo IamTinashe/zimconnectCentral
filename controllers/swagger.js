@@ -22,7 +22,7 @@ const swaggerOptions = {
       description: "Zimconnect API Documentation",
     },
   ],
-  apis: ['./controllers/health.js', './controllers/users.js', './controllers/resumes.js'],
+  apis: ['./controllers/health.js', './controllers/users.js', './controllers/resumes.js', './controllers/auth.js',],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);

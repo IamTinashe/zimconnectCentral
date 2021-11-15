@@ -31,6 +31,94 @@ router.get('/all', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /users/id/:id:
+ *   get:
+ *     tags:
+ *       - Users
+ *     description: Gets user by ID
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Success
+ *       500:
+ *         description: Internal Server Error
+ */
+ router.get('/id/:id', async (req, res) => {
+  let models = new Models();
+  try {
+    let data = await models.getUser('id', req.params.id);
+    if (data.hasOwnProperty('user') && data.user == false) {
+      return res.status(data.status).json(data.message);
+    } else{
+      return res.status(200).json(data);
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
+
+/**
+ * @swagger
+ * /users/email/:id:
+ *   get:
+ *     tags:
+ *       - Users
+ *     description: Gets user by email
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Success
+ *       500:
+ *         description: Internal Server Error
+ */
+ router.get('/email/:id', async (req, res) => {
+  let models = new Models();
+  try {
+    let data = await models.getUser('email', req.params.id);
+    if (data.hasOwnProperty('user') && data.user == false) {
+      return res.status(data.status).json(data.message);
+    } else{
+      return res.status(200).json(data);
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
+
+/**
+ * @swagger
+ * /users/username/:id:
+ *   get:
+ *     tags:
+ *       - Users
+ *     description: Gets user by username
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Success
+ *       500:
+ *         description: Internal Server Error
+ */
+ router.get('/username/:id', async (req, res) => {
+  let models = new Models();
+  try {
+    let data = await models.getUser('username', req.params.id);
+    if (data.hasOwnProperty('user') && data.user == false) {
+      return res.status(data.status).json(data.message);
+    } else{
+      return res.status(200).json(data);
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
+
+
 
 /**
  * @swagger

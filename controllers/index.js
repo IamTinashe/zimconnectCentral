@@ -7,6 +7,7 @@ const Health = require('./health');
 const Resumes = require('./resumes');
 const Users = require('./users');
 const Swagger = require('./swagger');
+const Auth = require('./auth');
 
 
 const app = express();
@@ -20,5 +21,6 @@ app.use('/', Health);
 app.use('/resumes', Resumes);
 app.use('/users', Users);
 app.use('/swagger-ui', Swagger);
+app.use('/auth', Auth);
 
 module.exports = app;
