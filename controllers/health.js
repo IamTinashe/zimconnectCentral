@@ -1,7 +1,18 @@
 'use strict';
 const express = require('express');
-const app = express();
+const router = express.Router()
 
-exports.health = app.get('/health', async (req, res) => {
+/**
+ * @swagger
+ * /health:
+ *    get:
+ *      description: Get health
+ *      responses:
+ *        200:
+ *          description: Success
+ */
+router.get('/health', async (req, res) => {
   return res.status(200).json({ 'healthy': true });
 });
+
+module.exports = router;

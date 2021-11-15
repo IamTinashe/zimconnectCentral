@@ -1,13 +1,13 @@
 'use strict';
 const express = require('express');
+const router = express.Router();
 const Models = require('../models');
-const Mails = require('../mails')
-const app = express();
+const Mails = require('../mails');
 
 
 
 
-exports.all = app.get('/all', async (req, res) => {
+router.get('/all', async (req, res) => {
   let models = new Models();
   try {
     let data = await models.getUsers();
@@ -17,7 +17,7 @@ exports.all = app.get('/all', async (req, res) => {
   }
 });
 
-exports.create = app.post('/create', async (req, res) => {
+router.post('/create', async (req, res) => {
   let models = new Models();
   let mails = new Mails();
   try {
@@ -46,7 +46,7 @@ exports.create = app.post('/create', async (req, res) => {
   }
 });
 
-exports.delete = app.delete('/delete', async (req, res) => {
+router.delete('/delete', async (req, res) => {
   let models = new Models();
   try {
     let data = await models.deleteUser(req.body);
@@ -55,3 +55,5 @@ exports.delete = app.delete('/delete', async (req, res) => {
     return res.status(500).json(error);
   }
 });
+
+module.exports = router;

@@ -3,25 +3,22 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 
-const healthController = require('./health');
-const resumeController = require('./resumes');
-const usersController = require('./users');
+const Health = require('./health');
+const Resumes = require('./resumes');
+const Users = require('./users');
+const Swagger = require('./swagger');
+
 
 const app = express();
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 
 
-app.use('/', healthController.health);
-app.use('/resumes', resumeController.all);
-app.use('/resumes', resumeController.computed);
-
-
-app.use('/users', usersController.all);
-app.use('/users', usersController.create);
-app.use('/users', usersController.delete);
+app.use('/', Health);
+app.use('/resumes', Resumes);
+app.use('/users', Users);
+app.use('/swagger', Swagger);
 
 module.exports = app;

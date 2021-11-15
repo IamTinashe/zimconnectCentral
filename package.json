@@ -37,7 +37,9 @@
     "nodemailer": "^6.7.0",
     "passport": "^0.4.0",
     "passport-http-bearer": "^1.0.1",
-    "passport-jwt": "4.0.0"
+    "passport-jwt": "4.0.0",
+    "swagger-jsdoc": "^6.1.0",
+    "swagger-ui-express": "^4.1.6"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"
