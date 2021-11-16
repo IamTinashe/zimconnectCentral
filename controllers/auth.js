@@ -101,7 +101,79 @@ router.post('/login', async (req, res) => {
       return res.status(data.status).json(data.message);
     } else{
       let token = 1;
-      return res.header('Authorization', `Bearer ${token}`).status(200).json(data);
+      return res.header('Authorization', `Bearer ${token}`).status(201).json(data);
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
+
+/**
+ * @swagger
+ * /auth/forgot:
+ *   put:
+ *     tags:
+ *       - Authentication
+ *     description: Forgot Password
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: reset
+ *         description: forgot object
+ *         in: body
+ *         required: true
+ *     responses:
+ *       201:
+ *         description: User forgot password email sent
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal Server Error
+ */
+ router.put('/forgot', async (req, res) => {
+  let models = new Models();
+  try {
+    let data = await models.forgotPassword(req.body);
+    if (data.hasOwnProperty('user') && data.user == false) {
+      return res.status(data.status).json(data.message);
+    } else{
+      return res.status(201).json(data);
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
+
+/**
+ * @swagger
+ * /auth/reset:
+ *   put:
+ *     tags:
+ *       - Authentication
+ *     description: Reset Password
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: reset
+ *         description: reset object
+ *         in: body
+ *         required: true
+ *     responses:
+ *       201:
+ *         description: User reset password success
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal Server Error
+ */
+ router.put('/reset', async (req, res) => {
+  let models = new Models();
+  try {
+    let data = await models.resetPassword(req.body);
+    if (data.hasOwnProperty('user') && data.user == false) {
+      return res.status(data.status).json(data.message);
+    } else{
+      return res.status(201).json(data);
     }
   } catch (error) {
     return res.status(500).json(error);
