@@ -103,6 +103,10 @@ module.exports = class Models {
         return { user: false, message: 'User does not exist in the authentication table', status: 404}
       } else if(user.password != body.password) {
         return { user: false, message: 'Unauthorized. Password incorrect', status: 401}
+      }else if(user.confirmed == false) {
+          return { user: false, message: 'Unauthorized. User has not confirmed their email address', status: 401}
+      }else if(user.active == false) {
+          return { user: false, message: 'Unauthorized. User has not been activated', status: 401}
       }else{
         user = await Users.findOne({ email: body.email });
         if(user == null){
@@ -121,14 +125,14 @@ module.exports = class Models {
       let user = await Auth.findOne({ email: body.email });
       if(user == null){
         return { user: false, message: 'User does not exist in the authentication table', status: 404}
-      } else if(user.password != body.password) {
-        return { user: false, message: 'Unauthorized. Password incorrect', status: 401}
       }else{
-        user = await Users.findOne({ email: body.email });
-        if(user == null){
-          return { user: false, message: 'User does not exist in the users table', status: 404}
+        if(user.confirmationCode != body.confirmationCode){
+          return { user: false, message: 'Incorrect confirmation code', status: 401}
         }else{
-          return user;
+          user.active = true;
+          user.confirmed = true;
+          Auth.findOneAndUpdate({ email: body.email }, {$set: user});
+          return await Users.findOne({ email: body.email });
         }
       }
     } catch (error) {
