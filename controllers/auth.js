@@ -134,11 +134,13 @@ router.post('/login', async (req, res) => {
  */
  router.put('/forgot', async (req, res) => {
   let models = new Models();
+  let mails = new Mails();
   try {
     let data = await models.forgotPassword(req.body);
     if (data.hasOwnProperty('user') && data.user == false) {
       return res.status(data.status).json(data.message);
     } else{
+      await mails.forgotPassword(data);
       return res.status(201).json(data);
     }
   } catch (error) {

@@ -192,7 +192,9 @@ module.exports = class Models {
             console.error(error);
           }
         });
-        return await Users.findOne({ email: body.email });
+        user = await Users.findOne({ email: body.email });
+        user.confirmationCode =  code;
+        return user;
       }
     } catch (error) {
       return error;

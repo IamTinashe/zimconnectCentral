@@ -4,6 +4,8 @@ const systemEmail = 'noreply@zimconnect.org';
 
 const AccountCreated = require('./accountcreated');
 const AccountConfirmed = require('./accountconfirmed');
+const ForgotPassword = require('./forgotpassword');
+
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   secure: false,
@@ -44,6 +46,22 @@ module.exports = class Mail {
       to: user.email,
       subject: 'You Have Successfully Confirmed Your Email Address',
       html: accountConfirmed.mail(user)
+    }
+
+    await transporter.sendMail(message).then(response => {
+      return response;
+    }).catch(error => {
+      return error;
+    })
+  }
+
+  async forgotPassword(user){
+    let forgotPassword = new ForgotPassword();
+    let message = {
+      from: `Zimconnect <${systemEmail}>`,
+      to: user.email,
+      subject: 'Forgot Password',
+      html: forgotPassword.mail(user)
     }
 
     await transporter.sendMail(message).then(response => {
