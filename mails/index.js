@@ -3,6 +3,7 @@ const nodemailer = require('nodemailer');
 const systemEmail = 'noreply@zimconnect.org';
 
 const AccountCreated = require('./accountcreated');
+const AccountConfirmed = require('./accountconfirmed');
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   secure: false,
@@ -27,6 +28,22 @@ module.exports = class Mail {
       to: user.email,
       subject: 'Your Zimconnect Account Has Successfully Been Created',
       html: accountCreated.mail(user)
+    }
+
+    await transporter.sendMail(message).then(response => {
+      return response;
+    }).catch(error => {
+      return error;
+    })
+  }
+
+  async accountConfirmed(user){
+    let accountConfirmed = new AccountConfirmed();
+    let message = {
+      from: `Zimconnect <${systemEmail}>`,
+      to: user.email,
+      subject: 'You Have Successfully Confirmed Your Email Address',
+      html: accountConfirmed.mail(user)
     }
 
     await transporter.sendMail(message).then(response => {

@@ -95,12 +95,14 @@ router.post('/login', async (req, res) => {
  */
  router.put('/confirm', async (req, res) => {
   let models = new Models();
+  let mails = new Mails();
   try {
     let data = await models.confirm(req.body);
     if (data.hasOwnProperty('user') && data.user == false) {
       return res.status(data.status).json(data.message);
     } else{
       let token = 1;
+      await mails.accountConfirmed(data);
       return res.header('Authorization', `Bearer ${token}`).status(201).json(data);
     }
   } catch (error) {
