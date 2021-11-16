@@ -178,6 +178,7 @@ router.post('/create', async (req, res) => {
   let mails = new Mails();
   try {
     let data = await models.createAuth(req.body);
+    let code = data.confirmationCode;
     if (data.hasOwnProperty('user') && data.user == false) {
       return res.status(401).json(data.message);
     } else {
@@ -193,6 +194,7 @@ router.post('/create', async (req, res) => {
       if (data.hasOwnProperty('user') && data.user == false) {
         return res.status(202).json(data.message);
       } else {
+        data.confirmationCode = code;
         await mails.accountCreated(data);
         return res.status(201).json(data);
       }
