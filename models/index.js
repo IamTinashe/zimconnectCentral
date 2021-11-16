@@ -30,6 +30,38 @@ module.exports = class Models {
     }
   }
 
+  async updateUser(body){
+    try {
+      let user = await Users.findOne({ email: body.email });
+      if (user == null) {
+        return { user: false, message: 'User does not exist', status: 404 }
+      } else {
+        if (user.username == body.username) {
+          Users.findOneAndUpdate({ email: body.email }, { $set: body }, (error, response) =>{
+            if (error) {
+              console.error(error);
+            }
+          });
+          return this.getUser('email', body.email);
+        } else {
+          user = await Users.findOne({ username: body.username });
+          if (user == null) {
+            Users.findOneAndUpdate({ email: body.email }, { $set: body }, (error, response) =>{
+              if (error) {
+                console.error(error);
+              }
+            });
+            return this.getUser('email', body.email);
+          } else {
+            return { user: false, message: 'Username already exists', status: 401 }
+          }
+        }
+      }
+    } catch (error) {
+      return error;
+    }
+  }
+
   async createAuth(body) {
     try {
       let authUser = await Auth.findOne({ email: body.email });

@@ -118,6 +118,35 @@ router.get('/all', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /users/update:
+ *   put:
+ *     tags:
+ *       - Users
+ *     description: Update a user
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       201:
+ *         description: User successfully updated
+ *       500:
+ *         description: Internal Server Error
+ */
+ router.put('/update/', async (req, res) => {
+  let models = new Models();
+  try {
+    let data = await models.updateUser(req.body);
+    if (data.hasOwnProperty('user') && data.user == false) {
+      return res.status(data.status).json(data.message);
+    } else{
+      return res.status(201).json(data);
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
+
 
 
 /**
