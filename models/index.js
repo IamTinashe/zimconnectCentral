@@ -75,7 +75,9 @@ module.exports = class Models {
             password: body.password,
             active: false,
             confirmed: false,
-            confirmationCode: code
+            confirmationCode: code,
+            createdAt: Date.now(),
+            loggedIn: false,
           });
           return await auth.save();
         } else {
@@ -140,6 +142,12 @@ module.exports = class Models {
       } else if (user.active == false) {
         return { user: false, message: 'Unauthorized. User has not been activated', status: 401 }
       } else {
+        let query = { loggedIn: true };
+        Auth.findOneAndUpdate({ email: body.email }, { $set: query }, (error, response) =>{
+          if (error) {
+            console.error(error);
+          }
+        });
         user = await Users.findOne({ email: body.email });
         if (user == null) {
           return { user: false, message: 'User does not exist in the users table', status: 404 }

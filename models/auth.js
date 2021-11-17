@@ -9,7 +9,10 @@ let authSchema = new Schema({
   password: { type: String, required: true },
   active: Boolean,
   confirmed: Boolean,
-  confirmationCode: Number
+  confirmationCode: Number,
+  loggedIn: { type: Boolean },
+  loggedInAt: { type: Date, default: Date.now },
+  createdAt: { type: Date },
 });
 
 const Auth = mongoose.model('auth', authSchema);
