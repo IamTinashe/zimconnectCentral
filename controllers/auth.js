@@ -56,6 +56,15 @@ const Mails = require('../mails');
  *     status:
  *      type: number
  *      description: Status code
+ *   LoggedOut:
+ *    type: object 
+ *    properties:
+ *     user:
+ *      type: boolean
+ *      description: true if user is logged out.
+ *     message:
+ *      type: string
+ *      description: Successfully logged out message.
  * securitySchemes:
  *  BearerAuth:
  *    type: http
@@ -192,7 +201,7 @@ router.post('/login', async (req, res) => {
   try {
     let data = await models.authenticate(req.body);
     if (data.hasOwnProperty('user') && data.user == false) {
-      return res.status(data.status).json(data.message);
+      return res.status(data.status).json(data);
     } else{
       let token = 1;
       return res.header('Authorization', `Bearer ${token}`).status(200).json(data);
@@ -248,7 +257,7 @@ router.post('/login', async (req, res) => {
   try {
     let data = await models.confirm(req.body);
     if (data.hasOwnProperty('user') && data.user == false) {
-      return res.status(data.status).json(data.message);
+      return res.status(data.status).json(data);
     } else{
       let token = 1;
       await mails.accountConfirmed(data);
@@ -364,6 +373,61 @@ router.post('/login', async (req, res) => {
       return res.status(data.status).json(data);
     } else{
       await mails.resetPassword(data);
+      return res.status(201).json(data);
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
+
+
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     tags:
+ *       - Authentication
+ *     description: Logs out user
+ *     produces:
+ *       - application/json
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: Logs out user
+ *         required: true
+ *         schema:
+ *          $ref: '#/definitions/Forgot'
+ *     responses:
+ *       201:
+ *         description: User successfully logged out
+ *         schema:
+ *          type: boolean
+ *          $ref: '#/components/schemas/LoggedOut'
+ *       401:
+ *         description: Unauthorized
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Error'
+ *       404:
+ *         description: User not found
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Internal Server Error
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Error'
+ */
+ router.put('/logout', async (req, res) => {
+  let models = new Models();
+  try {
+    let data = await models.logout(req.body);
+    if (data.hasOwnProperty('user') && data.user == false) {
+      return res.status(data.status).json(data);
+    } else{
       return res.status(201).json(data);
     }
   } catch (error) {

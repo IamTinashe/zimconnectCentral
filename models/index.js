@@ -160,6 +160,30 @@ module.exports = class Models {
     }
   }
 
+  async logout(body){
+    try {
+      let user = await Auth.findOne({ email: body.email });
+      if (user == null) {
+        return { user: false, message: 'User does not exist in the authentication table', status: 404 }
+      } else {
+        let query = { loggedIn: false };
+        Auth.findOneAndUpdate({ email: body.email }, { $set: query }, (error, response) =>{
+          if (error) {
+            console.error(error);
+          }
+        });
+        User.findOneAndUpdate({ email: body.email }, { $set: query }, (error, response) =>{
+          if (error) {
+            console.error(error);
+          }
+        });
+        return { user: true, message: 'User has been logged out' };
+      }
+    } catch (error) {
+      return error;
+    }
+  }
+
   async confirm(body) {
     try {
       let user = await Auth.findOne({ email: body.email });
