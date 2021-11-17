@@ -44,9 +44,15 @@ const Mails = require('../mails');
  *   Error:
  *    type: object 
  *    properties:
+ *     user:
+ *      type: boolean
+ *      description: false by default.
  *     message:
  *      type: string
  *      description: Error message
+ *     status:
+ *      type: number
+ *      description: Status code
  * securitySchemes:
  *  BearerAuth:
  *    type: http
@@ -80,6 +86,32 @@ const Mails = require('../mails');
 *      type: string
 *      format: email
 *      description: Email of the user
+*     confirmationCode:
+*      type: number
+*      description: Confirmation code of the user
+*   Forgot:
+*    type: object
+*    required:
+*     - email
+*    properties:
+*     email:
+*      type: string
+*      format: email
+*      description: Email of the user
+*   Reset:
+*    type: object
+*    required:
+*     - email
+*     - password
+*     - confirmationCode
+*    properties:
+*     email:
+*      type: string
+*      format: email
+*      description: Email of the user
+*     password:
+*      type: string
+*      description: Password of the user
 *     confirmationCode:
 *      type: number
 *      description: Confirmation code of the user
@@ -230,21 +262,39 @@ router.post('/login', async (req, res) => {
  *   put:
  *     tags:
  *       - Authentication
- *     description: Forgot Password
+ *     description: Sends reset password email
  *     produces:
  *       - application/json
+ *     consumes:
+ *       - application/json
  *     parameters:
- *       - name: reset
+ *       - name: forgot
  *         description: forgot object
  *         in: body
  *         required: true
+ *         schema:
+ *          $ref: '#/definitions/Forgot'
  *     responses:
  *       201:
- *         description: User forgot password email sent
+ *         description: User successfully sent reset password email
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Unauthorized
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Error'
  *       404:
  *         description: User not found
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Error'
  *       500:
  *         description: Internal Server Error
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Error'
  */
  router.put('/forgot', async (req, res) => {
   let models = new Models();
@@ -252,7 +302,7 @@ router.post('/login', async (req, res) => {
   try {
     let data = await models.forgotPassword(req.body);
     if (data.hasOwnProperty('user') && data.user == false) {
-      return res.status(data.status).json(data.message);
+      return res.status(data.status).json(data);
     } else{
       await mails.forgotPassword(data);
       return res.status(201).json(data);
@@ -268,21 +318,39 @@ router.post('/login', async (req, res) => {
  *   put:
  *     tags:
  *       - Authentication
- *     description: Reset Password
+ *     description: Resets password
  *     produces:
+ *       - application/json
+ *     consumes:
  *       - application/json
  *     parameters:
  *       - name: reset
  *         description: reset object
  *         in: body
  *         required: true
+ *         schema:
+ *          $ref: '#/definitions/Reset'
  *     responses:
  *       201:
- *         description: User reset password success
+ *         description: User successfully reset password
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Unauthorized
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Error'
  *       404:
  *         description: User not found
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Error'
  *       500:
  *         description: Internal Server Error
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Error'
  */
  router.put('/reset', async (req, res) => {
   let models = new Models();
@@ -290,7 +358,7 @@ router.post('/login', async (req, res) => {
   try {
     let data = await models.resetPassword(req.body);
     if (data.hasOwnProperty('user') && data.user == false) {
-      return res.status(data.status).json(data.message);
+      return res.status(data.status).json(data);
     } else{
       await mails.resetPassword(data);
       return res.status(201).json(data);

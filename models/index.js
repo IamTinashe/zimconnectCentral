@@ -209,9 +209,15 @@ module.exports = class Models {
       } else {
         if (user.confirmationCode != body.confirmationCode) {
           return { user: false, message: 'Incorrect confirmation code', status: 401 }
+        }else if(body.password == user.password) {
+          return { user: false, message: 'Password cannot be the same as the old password', status: 401 }
+        }else if(body.password.length < 6) {
+          return { user: false, message: 'Password should be greater than 6 characters', status: 401 }
         } else {
           let query = {
             confirmed: true,
+            active: true,
+            password: body.password
           }
           Auth.findOneAndUpdate({ 'email': body.email }, { $set: query }, (error, response) =>{
             if (error) {
