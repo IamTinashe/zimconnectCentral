@@ -16,6 +16,7 @@ module.exports = class Services {
     data = await compute.getProfession();
     data = await compute.filterEducation();
     data = await compute.filterSkills();
+    data = await compute.getCVURL();
     //data = await compute.getYearsOfExperience();
 
     return data;
