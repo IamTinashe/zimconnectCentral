@@ -1,6 +1,5 @@
 'use strict';
 const nodemailer = require('nodemailer');
-const systemEmail = 'noreply@zimconnect.org';
 
 const AccountCreated = require('./accountcreated');
 const AccountConfirmed = require('./accountconfirmed');
@@ -8,13 +7,13 @@ const ForgotPassword = require('./forgotpassword');
 const ResetPassword = require('./resetpassword');
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
+  host: process.env.MAIL_HOST,
   secure: false,
   requireTLC: true,
-  port: 587,
+  port: process.env.MAIL_PORT,
   auth: {
-    user: systemEmail,
-    pass: 'global2019!'
+    user: process.env.EMAIL_USERNAME,
+    pass: process.env.MAIL_PASSWORD
   },
   tls: {
     rejectUnauthorized: false,
@@ -27,7 +26,7 @@ module.exports = class Mail {
   async accountCreated(user){
     let accountCreated = new AccountCreated();
     let message = {
-      from: `Zimconnect <${systemEmail}>`,
+      from: `Zimconnect <${process.env.EMAIL_USERNAME}>`,
       to: user.email,
       subject: 'Your Zimconnect Account Has Successfully Been Created',
       html: accountCreated.mail(user)
@@ -43,7 +42,7 @@ module.exports = class Mail {
   async accountConfirmed(user){
     let accountConfirmed = new AccountConfirmed();
     let message = {
-      from: `Zimconnect <${systemEmail}>`,
+      from: `Zimconnect <${process.env.EMAIL_USERNAME}>`,
       to: user.email,
       subject: 'You Have Successfully Confirmed Your Email Address',
       html: accountConfirmed.mail(user)
@@ -59,7 +58,7 @@ module.exports = class Mail {
   async forgotPassword(user){
     let forgotPassword = new ForgotPassword();
     let message = {
-      from: `Zimconnect <${systemEmail}>`,
+      from: `Zimconnect <${process.env.EMAIL_USERNAME}>`,
       to: user.email,
       subject: 'Forgot Password',
       html: forgotPassword.mail(user)
@@ -75,7 +74,7 @@ module.exports = class Mail {
   async resetPassword(user){
     let resetPassword = new ResetPassword();
     let message = {
-      from: `Zimconnect <${systemEmail}>`,
+      from: `Zimconnect <${process.env.EMAIL_USERNAME}>`,
       to: user.email,
       subject: 'Your Password Has Successfully Been Reset',
       html: resetPassword.mail(user)

@@ -4,11 +4,11 @@ const Resumes = require('./resumes');
 const Auth = require('./auth');
 const Utils = require('../utils');
 const mongoose = require('mongoose');
-const username = 'admin';
-const password = 'zimconnect';
-const host = '159.69.120.82';
-const port = '27017';
-const db = 'zimconnect';
+const username = process.env.DB_USERNAME;
+const password = process.env.DB_PASSWORD;
+const host = process.env.DB_HOST;
+const port = process.env.DB_PORT;
+const db = process.env.DB_NAME;
 
 const utils = new Utils();
 
