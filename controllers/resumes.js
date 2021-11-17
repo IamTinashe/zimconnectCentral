@@ -61,14 +61,14 @@ router.post('/update', async (req, res) => {
   try {
     let data = await services.compute();
     let index = 0;
-    for(index in data){
-      ResumesModel.findOneAndUpdate({ 'email': data[index].email }, { $set: data[index] }, {upsert: true}, (error, response) =>{
+    for (index in data) {
+      ResumesModel.findOneAndUpdate({ 'email': data[index].email }, { $set: data[index] }, { upsert: true }, (error, response) => {
         if (error) {
           console.error(error);
         }
       });
     }
-    return res.status(201).json({message: 'Successfully updated all resumes'});
+    return res.status(201).json({ message: 'Successfully updated all resumes' });
   } catch (error) {
     return res.status(500).json(error);
   }
@@ -96,7 +96,7 @@ router.post('/search', async (req, res) => {
 router.delete('/delete', async (req, res) => {
   try {
     await ResumesModel.deleteMany();
-    return res.status(200).json({message: 'Successfully deleted all resumes'});
+    return res.status(200).json({ message: 'Successfully deleted all resumes' });
   } catch (error) {
     return res.status(500).json(error);
   }

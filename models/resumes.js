@@ -19,6 +19,7 @@ let resumesSchema = new Schema({
   salary: String,
   views: Number,
   selectionStatus: Array,
+  availability: Boolean,
 });
 
 const Resumes = mongoose.model('resumes', resumesSchema);
