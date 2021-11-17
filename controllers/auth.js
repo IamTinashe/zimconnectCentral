@@ -173,21 +173,39 @@ router.post('/login', async (req, res) => {
  *   put:
  *     tags:
  *       - Authentication
- *     description: Confirms User
+ *     description: Confirms User account
  *     produces:
+ *       - application/json
+ *     consumes:
  *       - application/json
  *     parameters:
  *       - name: confirmation
  *         description: confirmation object
  *         in: body
  *         required: true
+ *         schema:
+ *          $ref: '#/definitions/Confirm'
  *     responses:
  *       201:
  *         description: User successfully confirmed email
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Unauthorized
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Error'
  *       404:
  *         description: User not found
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Error'
  *       500:
  *         description: Internal Server Error
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Error'
  */
  router.put('/confirm', async (req, res) => {
   let models = new Models();
