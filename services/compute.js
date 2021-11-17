@@ -85,16 +85,31 @@ module.exports = class Compute {
 
   async getYearsOfExperience() {
     let index = 0;
-    let length = this.resumes.length;
-    console.log(length)
-    for (index = 0; index < 1953; index++) {
-      console.log(this.resumes[index].hasOwnProperty("experience_start"));
-      //console.log(this.resumes[index]);
-      //console.log(this.resumes[index].experience_start)
-      let start = await utils.smallestDate(this.resumes[index].experience_start);
-      let end = await utils.smallestDate(this.resumes[index].experience_end);
-      //   let years = utils.dateDifference(start, end)
-      //console.log(end)
+    for (index in this.resumes) {
+      this.resumes[index].yearsOfExp = 0;
+      try {
+        if(Array.isArray(this.resumes[index].experience_start) && this.resumes[index].experience_start.length > 0){
+          if(Array.isArray(this.resumes[index].experience_end) && this.resumes[index].experience_end.length > 0){
+            let months = 0;
+            while(this.resumes[index].experience_start.length > 0){
+              let start = utils.smallestDate(this.resumes[index].experience_start);
+              let end = utils.smallestDate(this.resumes[index].experience_end);
+              if(end == null || end == undefined || end == ''){
+                end = new Date();
+                end = end.toISOString().slice(0, 10);
+              }
+              this.resumes[index].experience_start.splice(this.resumes[index].experience_start.indexOf(start), 1);
+              this.resumes[index].experience_end.splice(this.resumes[index].experience_end.indexOf(end), 1)
+              months = utils.dateDifference(start, end) + months;
+            }
+            this.resumes[index].yearsOfExp = Math.round(months / 12);
+            delete this.resumes[index].experience_start;
+            delete this.resumes[index].experience_end;
+          }
+        }
+      } catch (error) {
+        console.log(error)
+      }
     }
     return this.resumes;
   }
@@ -139,6 +154,22 @@ module.exports = class Compute {
         console.error(error);
       }
       delete this.resumes[index].userimage;
+    }
+    return this.resumes;
+  }
+
+  async getAudioURL() {
+    let index = 0;
+    for (index in this.resumes) {
+      try {
+        if (Array.isArray(this.resumes[index].audioclip) && this.resumes[index].audioclip.length > 0) {
+          this.resumes[index].audioclip = this.resumes[index].audioclip[0];
+        }else{
+          this.resumes[index].audioclip = '';
+        }
+      } catch (error) {
+        console.error(error);
+      }
     }
     return this.resumes;
   }

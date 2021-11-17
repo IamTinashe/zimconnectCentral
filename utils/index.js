@@ -11,24 +11,32 @@ module.exports = class Utils {
     }
   }
 
-  async dateDifference(date1, date2) {
-    let diff = new Date(date2.getTime() - date1.getTime());
-    let years = diff.getUTCFullYear() - 1970;
-    if (diff.getUTCMonth() > 7)
-      years = years + 1
-    return years;
+  dateDifference(date1, date2) {
+    date1 = new Date(date1);
+    date2 = new Date(date2);
+    try{
+      if(date1 > date2){
+        let x = date1;
+        date1 = date2;
+        date2 = x;
+      }
+      let months;
+      months = (date2.getFullYear() - date1.getFullYear()) * 12;
+      months -= date1.getMonth();
+      months += date2.getMonth();
+      return months <= 0 ? 0 : months;
+    }catch(error){
+      return 0;
+    }
   }
 
-  async smallestDate(array) {
-    let j = 0;
+  smallestDate(array) {
+    let index = 0;
     let smallest = array[0];
-    while (j < array.length) {
-      if ((new Date(array[j]) !== "Invalid Date") && !isNaN(new Date(array[j]))) {
-        if (smallest.getTime() > array[j].getTime()) {
-          smallest = array[j];
-        }
+    for(index in array){
+      if(new Date(array[index]) < new Date(smallest)){
+        smallest = array[index];
       }
-      j++;
     }
     return smallest;
   }
