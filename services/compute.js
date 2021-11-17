@@ -125,6 +125,24 @@ module.exports = class Compute {
     return this.resumes;
   }
 
+  async getImageURL() {
+    let index = 0;
+    for (index in this.resumes) {
+      this.resumes[index].image_url = '';
+      try {
+        if (typeof this.resumes[index].userimage === 'object') {
+          if(this.resumes[index].userimage.hasOwnProperty('file_url')){
+            this.resumes[index].image_url = this.resumes[index].userimage.file_url;
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+      delete this.resumes[index].userimage;
+    }
+    return this.resumes;
+  }
+
   async filterEducation() {
     this.resumes = this.resumes.filter(object => object.education.length != 0);
     return this.resumes;

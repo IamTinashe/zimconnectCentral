@@ -14,7 +14,8 @@ let resumesSchema = new Schema({
   education: Array,
   profession: String,
   audioclip_url: String,
-  cv_url: String
+  cv_url: String,
+  image_url: String
 });
 
 const Resumes = mongoose.model('resumes', resumesSchema);
