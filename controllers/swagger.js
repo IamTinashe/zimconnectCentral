@@ -6,6 +6,7 @@ const app = express();
 
 const swaggerOptions = {
   swaggerDefinition: {
+    components: {},
     info: {
       title: 'Zimconnect Endpoints',
       version: '1.0.0',
