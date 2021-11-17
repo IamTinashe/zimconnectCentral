@@ -30,7 +30,7 @@ module.exports = class Compute {
             education.push({
               title: this.resumes[index].education_title[i],
               academy: this.resumes[index].education_academy[i],
-              qualification: this.resumes[index].education[i]
+              description: this.resumes[index].education[i]
             })
           }
         } else {
@@ -39,7 +39,7 @@ module.exports = class Compute {
             education.push({
               title: this.resumes[index].education_title[i],
               academy: this.resumes[index].education_academy[i],
-              qualification: ''
+              description: ''
             })
           }
         }
@@ -49,7 +49,7 @@ module.exports = class Compute {
           for (i in this.resumes[index].education) {
             education.push({
               academy: '',
-              qualification: this.resumes[index].education[i],
+              description: this.resumes[index].education[i],
               title: this.resumes[index].education_title[i],
             })
           }
@@ -103,10 +103,10 @@ module.exports = class Compute {
               months = utils.dateDifference(start, end) + months;
             }
             this.resumes[index].yearsOfExp = Math.round(months / 12);
-            delete this.resumes[index].experience_start;
-            delete this.resumes[index].experience_end;
           }
         }
+        delete this.resumes[index].experience_start;
+        delete this.resumes[index].experience_end;
       } catch (error) {
         console.log(error)
       }
@@ -182,5 +182,36 @@ module.exports = class Compute {
   async filterSkills() {
     this.resumes = this.resumes.filter(object => object.skills.length != 0);
     return this.resumes;
+  }
+
+  async formatText() {
+    try{
+      let index = 0;
+      for (index in this.resumes) {
+        if(this.resumes[index].skills.length > 0){
+          let j = 0;
+          for(j in this.resumes[index].skills){
+            this.resumes[index].skills[j] = this.resumes[index].skills[j].replace(/\r?\n?\t/g, '');
+          }
+        }
+
+        if(this.resumes[index].education.length > 0){
+          let k = 0;
+          for(k in this.resumes[index].education){
+            this.resumes[index].education[k].description = this.resumes[index].education[k].description.replace(/\r\n?\t/g, ' ');
+          }
+        }
+
+        if(this.resumes[index].education.length > 0){
+          let m = 0;
+          for(m in this.resumes[index].education){
+            this.resumes[index].education[m].title = this.resumes[index].education[m].title.replace(/\\/g, '');
+          }
+        }
+      }
+      return this.resumes;
+    } catch(error){
+      console.error(error);
+    }
   }
 }

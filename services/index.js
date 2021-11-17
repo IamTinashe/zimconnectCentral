@@ -20,6 +20,7 @@ module.exports = class Services {
     data = await compute.getImageURL();
     data = await compute.getAudioURL();
     data = await compute.getYearsOfExperience();
+    data = await compute.formatText();
 
     return data;
   }
