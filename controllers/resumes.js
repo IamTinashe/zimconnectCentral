@@ -1,6 +1,7 @@
 'use strict';
 const express = require('express');
 const Resumes = require('../services/resumes');
+const ResumesModel = require('../models/resumes');
 const Services = require('../services');
 const router = express.Router();
 
@@ -37,8 +38,8 @@ router.get('/all', async (req, res) => {
 
 /**
  * @swagger
- * /resumes/filtered:
- *   get:
+ * /resumes/update:
+ *   post:
  *     tags:
  *       - Resumes
  *     description: Gets All Filtered Resumes from Zimbojobs
@@ -55,12 +56,28 @@ router.get('/all', async (req, res) => {
  *       500:
  *         description: Internal Server Error
  */
-router.get('/filtered', async (req, res) => {
+router.post('/update', async (req, res) => {
   let services = new Services();
   try {
-    return res.status(200).json(await services.compute());
+    let data = await services.compute();
+    let index = 0;
+    for(index in data){
+      ResumesModel.findOneAndUpdate({ 'email': data.email }, { $set: data[index] }, {upsert: true}, (error, response) =>{
+        if (error) {
+          console.error(error);
+        }
+      });
+    }
+    return res.status(201).json({message: 'Successfully updated all resumes'});
   } catch (error) {
-    res.status(500);
+    return res.status(500).json(error);
+  }
+});
+
+router.get('/filtered', async (req, res) => {
+  try {
+    return res.status(200).json(await ResumesModel.find({}));
+  } catch (error) {
     return res.status(500).json(error);
   }
 });
