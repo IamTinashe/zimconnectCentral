@@ -62,7 +62,7 @@ router.post('/update', async (req, res) => {
     let data = await services.compute();
     let index = 0;
     for(index in data){
-      ResumesModel.findOneAndUpdate({ 'email': data.email }, { $set: data[index] }, {upsert: true}, (error, response) =>{
+      ResumesModel.findOneAndUpdate({ 'email': data[index].email }, { $set: data[index] }, {upsert: true}, (error, response) =>{
         if (error) {
           console.error(error);
         }
@@ -81,5 +81,26 @@ router.get('/filtered', async (req, res) => {
     return res.status(500).json(error);
   }
 });
+
+router.post('/search', async (req, res) => {
+  try {
+    let resumes = await ResumesModel.find({});
+    let selectedResumes = resumes.filter(object => object.skills.map(name => name.toLowerCase()).includes(req.body.skills.toLowerCase()));
+    selectedResumes.sort((a, b) => a.yearsOfExp.localeCompare(b.yearsOfExp)).reverse();
+    return res.status(200).json(selectedResumes);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
+
+router.delete('/delete', async (req, res) => {
+  try {
+    await ResumesModel.deleteMany();
+    return res.status(200).json({message: 'Successfully deleted all resumes'});
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
+
 
 module.exports = router;
