@@ -43,6 +43,12 @@ const Mails = require('../mails');
  *     message:
  *      type: string
  *      description: Error message
+ *   DeleteUser:
+ *    type: object 
+ *    properties:
+ *     deletedCount:
+ *      type: integer
+ *      description: Delete status of the user.
  */
 
 /**
@@ -77,6 +83,40 @@ const Mails = require('../mails');
 *     password:
 *      type: string
 *      description: Password of the user.
+*   DeleteUser:
+*    type: object
+*    required:
+*     - email
+*    properties:
+*     email:
+*      type: string
+*      format: email
+*      description: Email of the user
+*   UpdateUser:
+*    type: object
+*    required:
+*     - email
+*     - fullname
+*     - username
+*     - company
+*     - role
+*    properties:
+*     fullname:
+*      type: string
+*      description: User fullname
+*     email:
+*      type: string
+*      format: email
+*      description: Email of the user
+*     username:
+*      type: string
+*      description: Username of the user
+*     company:
+*      type: string
+*      description: Company of the user.
+*     role:
+*      type: string
+*      description: Role of the user.
 */
 
 
@@ -222,14 +262,39 @@ router.get('/username/:id', async (req, res) => {
  *   put:
  *     tags:
  *       - Users
- *     description: Update a user
+ *     description: Updates a user
  *     produces:
  *       - application/json
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: User object
+ *         required: true
+ *         schema:
+ *          $ref: '#/definitions/UpdateUser'
  *     responses:
  *       201:
- *         description: User successfully updated
+ *        description: User updated
+ *        schema:
+ *         type: object
+ *         $ref: '#/components/schemas/User'
+ *       401:
+ *        description: Unauthorized
+ *        schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Error'
+ *       404:
+ *        description: User not found
+ *        schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Error'
  *       500:
- *         description: Internal Server Error
+ *        description: Internal Server Error
+ *        schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Error'
  */
 router.put('/update/', async (req, res) => {
   let models = new Models();
@@ -326,19 +391,29 @@ router.post('/create', async (req, res) => {
  *   delete:
  *     tags:
  *       - Users
- *     description: Deletes a User
+ *     description: Deletes a User by email
  *     produces:
  *       - application/json
+ *     consumes:
+ *       - application/json
  *     parameters:
- *       - name: user
- *         description: User object
- *         in: body
- *         required: true
+ *       - in: body
+ *         name: body
+ *         description: Delete User object
+ *         required: true.
+ *         schema:
+ *          $ref: '#/definitions/DeleteUser'
  *     responses:
  *       201:
  *         description: User successfully deleted
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/DeleteUser'
  *       500:
  *         description: Internal Server Error
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Error'
  */
 router.delete('/delete', async (req, res) => {
   let models = new Models();
