@@ -40,24 +40,19 @@ router.get('/all', async (req, res) => {
 /**
  * @swagger
  * /resumes/update:
- *   post:
+ *   put:
  *     tags:
  *       - Resumes
- *     description: Gets All Filtered Resumes from Zimbojobs
+ *     description: Manually update all resumes from Zimbojobs to Zimconnect
  *     produces:
  *       - application/json
- *     parameters:
- *       - name: zimbojobsFilteredResumes
- *         description: zimbojobsfiltered object
- *         in: body
- *         required: true
  *     responses:
- *       200:
- *         description: Successfully retrieved all filtered resumes from Zimbojobs
+ *       201:
+ *         description: Successfully updated all resumes from Zimbojobs to Zimconnect
  *       500:
  *         description: Internal Server Error
  */
-router.post('/update', async (req, res) => {
+router.put('/update', async (req, res) => {
   let services = new Services();
   try {
     let data = await services.compute();
