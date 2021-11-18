@@ -2,7 +2,7 @@
   "name": "zimconnect",
   "version": "1.0.0",
   "description": "Zimworx Project",
-  "author": "Zimworx",
+  "author": "Tinashe Zvihwati",
   "private": true,
   "main": "index.js",
   "license": "MIT",
@@ -11,11 +11,12 @@
     "yarn": "*"
   },
   "scripts": {
-    "dev": "nodemon ./index.js"
+    "dev": "nodemon ./index.js",
+    "start": "node ./index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:danielfsousa/express-rest-es2017-boilerplate.git"
+    "url": "git@github.com:IamTinashe/zimconnectCentral.git"
   },
   "dependencies": {
     "axios": "^0.21.1",
