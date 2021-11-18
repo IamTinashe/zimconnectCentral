@@ -3,6 +3,7 @@ const express = require('express');
 const Resumes = require('../services/resumes');
 const ResumesModel = require('../models/resumes');
 const Services = require('../services');
+const web = require('../pools/web.json');
 const router = express.Router();
 
 /**
@@ -74,6 +75,21 @@ router.post('/update', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /resumes/filtered:
+ *  get:
+ *   tags:
+ *    - Resumes
+ *   description: Gets All Filtered Resumes from Zimconnect
+ *   produces:
+ *    - application/json
+ *   responses:
+ *    200:
+ *     description: Returns all filtered resumes from Zimconnect
+ *    500:
+ *     description: Internal Server Error
+ */
 router.get('/filtered', async (req, res) => {
   try {
     return res.status(200).json(await ResumesModel.find({}));
@@ -82,6 +98,22 @@ router.get('/filtered', async (req, res) => {
   }
 });
 
+
+/**
+ * @swagger
+ * /resumes/search:
+ *  post:
+ *   tags:
+ *    - Resumes
+ *   description: Searches for Resumes from Zimconnect with specific parameter
+ *   produces:
+ *    - application/json
+ *   responses:
+ *    200:
+ *     description: Returns array of searched resumes from Zimconnect
+ *    500:
+ *     description: Internal Server Error
+ */
 router.post('/search', async (req, res) => {
   try {
     let resumes = await ResumesModel.find({});
@@ -93,14 +125,44 @@ router.post('/search', async (req, res) => {
   }
 });
 
-router.delete('/delete', async (req, res) => {
+/**
+ * @swagger
+ * /resumes/skillset:
+ *  post:
+ *   tags:
+ *    - Resumes
+ *   description: Searches for Resumes from Zimconnect by skillset
+ *   produces:
+ *    - application/json
+ *   responses:
+ *    200:
+ *     description: Returns array of searched resumes from Zimconnect
+ *    500:
+ *     description: Internal Server Error
+ */
+router.post('/skillset', async (req, res) => {
   try {
-    await ResumesModel.deleteMany();
-    return res.status(200).json({ message: 'Successfully deleted all resumes' });
+    let resumes = await ResumesModel.find({});
+    if (req.body.skill == 'web') {
+      let selectedResumes = resumes.filter(object => object.skills.map(name => name.toLowerCase()).some(ai => web.values.includes(ai.toLowerCase())));
+      selectedResumes.sort((a, b) => a.yearsOfExp.localeCompare(b.yearsOfExp)).reverse();
+      return res.status(200).json(selectedResumes);
+    } else {
+      return res.status(200).json({ message: 'No results found' });
+    }
   } catch (error) {
     return res.status(500).json(error);
   }
 });
+
+// router.delete('/delete', async (req, res) => {
+//   try {
+//     await ResumesModel.deleteMany();
+//     return res.status(200).json({ message: 'Successfully deleted all resumes' });
+//   } catch (error) {
+//     return res.status(500).json(error);
+//   }
+// });
 
 
 module.exports = router;
