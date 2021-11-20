@@ -1,9 +1,20 @@
 'use strict';
+const fs = require('fs');
 const express = require('express');
 const Resumes = require('../services/resumes');
 const ResumesModel = require('../models/resumes');
 const Services = require('../services');
+
+
+
 const web = require('../pools/web.json');
+const accounting = require('../pools/accounting.json');
+const hr = require('../pools/hr.json');
+const sales = require('../pools/sales.json');
+const marketing = require('../pools/marketing.json');
+const generic = require('../pools/generic.json');
+
+
 const router = express.Router();
 
 
@@ -69,6 +80,9 @@ const router = express.Router();
  *     availability:
  *      type: boolean
  *      description: The availability of the candidate
+ *     resumeWeight:
+ *      type: number
+ *      description: The weight of the candidate
  *   ResumeError:
  *    type: object 
  *    properties:
@@ -309,7 +323,7 @@ router.post('/search', async (req, res) => {
     let resumes = await ResumesModel.find({});
     let selectedResumes = resumes.filter(object => object.skills.map(name => name.toLowerCase()).includes(req.body.skill.toLowerCase()));
     selectedResumes.sort((a, b) => a.yearsOfExp.localeCompare(b.yearsOfExp)).reverse();
-    if(selectedResumes.length > 0) {
+    if (selectedResumes.length > 0) {
       return res.status(200).json(selectedResumes);
     } else {
       return res.status(404).json({ message: 'No resumes found' });
@@ -357,16 +371,44 @@ router.post('/search', async (req, res) => {
 router.post('/skillset', async (req, res) => {
   try {
     let resumes = await ResumesModel.find({});
+    let selectedResumes = [];
+    let pool = [];
     if (req.body.skill == 'web') {
-      let selectedResumes = resumes.filter(object => object.skills.map(name => name.toLowerCase()).some(ai => web.values.includes(ai.toLowerCase())));
-      selectedResumes.sort((a, b) => a.yearsOfExp.localeCompare(b.yearsOfExp)).reverse();
-      if(selectedResumes.length > 0) {
-        return res.status(200).json(selectedResumes);
-      } else {
-        return res.status(404).json({ message: 'No resumes found' });
-      }
+      pool = web.values;
+    } else if (req.body.skill == 'accounting') {
+      pool = accounting.values;
+    } else if (req.body.skill == 'hr') {
+      pool = hr.values;
+    } else if (req.body.skill == 'sales') {
+      pool = sales.values;
+    } else if (req.body.skill == 'marketing') {
+      pool = marketing.values;
     } else {
       return res.status(404).json({ message: 'No results found' });
+    }
+    selectedResumes = resumes.filter(object => object.skills.map(name => name.toLowerCase()).some(ai => pool.includes(ai.toLowerCase())));
+    selectedResumes.sort((a, b) => a.yearsOfExp.localeCompare(b.yearsOfExp)).reverse();
+    if (selectedResumes.length > 0) {
+      let result = selectedResumes.map(a => a.skills);
+      let merged = [].concat.apply([], result);
+      let newmerged = merged.concat(web.values);
+      let words = newmerged.map(v => v.toLowerCase());
+      let uniq = [...new Set(words)];
+      uniq = uniq.map(v => v.toLowerCase());
+      let gen = generic.values.map(v => v.toLowerCase());
+      let resu = uniq.filter(item => !gen.includes(item));
+      // let values = {
+      //   "values": resu
+      // }
+      // fs.writeFile('./pools/marketing.json', JSON.stringify(values), 'utf8', error => {
+      //   if (error) {
+      //     console.error(error)
+      //     return
+      //   }
+      // });
+      return res.status(200).json(selectedResumes);
+    } else {
+      return res.status(404).json({ message: 'No resumes found' });
     }
   } catch (error) {
     return res.status(500).json(error);
