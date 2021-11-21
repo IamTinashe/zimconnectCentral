@@ -13,6 +13,8 @@ const hr = require('../pools/hr.json');
 const sales = require('../pools/sales.json');
 const marketing = require('../pools/marketing.json');
 const generic = require('../pools/generic.json');
+const genericeducation = require('../pools/genericeducation.json');
+const educationpool = require('../pools/education.json');
 
 
 const router = express.Router();
@@ -384,19 +386,19 @@ router.post('/skillset', async (req, res) => {
     } else if (req.body.skill == 'marketing') {
       pool = marketing.values;
     } else {
-      return res.status(404).json({ message: 'No results found' });
+      selectedResumes = resumes;
     }
-    selectedResumes = resumes.filter(object => object.skills.map(name => name.toLowerCase()).some(ai => pool.includes(ai.toLowerCase())));
+    //selectedResumes = resumes.filter(object => object.skills.map(name => name.toLowerCase()).some(ai => pool.includes(ai.toLowerCase())));
     selectedResumes.sort((a, b) => a.yearsOfExp.localeCompare(b.yearsOfExp)).reverse();
     if (selectedResumes.length > 0) {
-      let result = selectedResumes.map(a => a.skills);
-      let merged = [].concat.apply([], result);
-      let newmerged = merged.concat(web.values);
-      let words = newmerged.map(v => v.toLowerCase());
-      let uniq = [...new Set(words)];
-      uniq = uniq.map(v => v.toLowerCase());
-      let gen = generic.values.map(v => v.toLowerCase());
-      let resu = uniq.filter(item => !gen.includes(item));
+      // let result = selectedResumes.map(a => a.skills);
+      // let merged = [].concat.apply([], result);
+      // let newmerged = merged.concat(web.values);
+      // let words = newmerged.map(v => v.toLowerCase());
+      // let uniq = [...new Set(words)];
+      // uniq = uniq.map(v => v.toLowerCase());
+      // let gen = generic.values.map(v => v.toLowerCase());
+      // let resu = uniq.filter(item => !gen.includes(item));
       // let values = {
       //   "values": resu
       // }
@@ -406,6 +408,28 @@ router.post('/skillset', async (req, res) => {
       //     return
       //   }
       // });
+
+
+      let educationtitles = selectedResumes.map(a => a.education.map(b => b.title));
+      let merged = [].concat.apply([], educationtitles);
+      let newmerged = merged.concat(educationpool.marketing);
+      let words = newmerged.map(v => v.toLowerCase());
+      let uniq = [...new Set(words)];
+      uniq = uniq.map(v => v.toLowerCase());
+      let gen = genericeducation.values.map(v => v.toLowerCase());
+      let resu = uniq.filter(item => !gen.includes(item));
+      let hrRemoved = resu.filter(item => !educationpool.hr.includes(item));
+      let accountingRemoved = hrRemoved.filter(item => !educationpool.accounting.includes(item));
+      let webRemoved = accountingRemoved.filter(item => !educationpool.web.includes(item));
+      let marketingRemoved = webRemoved.filter(item => !educationpool.marketing.includes(item));
+      let salesRemoved = marketingRemoved.filter(item => !educationpool.sales.includes(item));
+      educationpool.dental = salesRemoved;
+      fs.writeFile('./pools/education.json', JSON.stringify(educationpool), 'utf8', error => {
+        if (error) {
+          console.error(error)
+          return
+        }
+      });
       return res.status(200).json(selectedResumes);
     } else {
       return res.status(404).json({ message: 'No resumes found' });
