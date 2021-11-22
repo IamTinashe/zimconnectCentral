@@ -193,9 +193,9 @@ module.exports = class Compute {
     for (index in this.resumes) {
       try {
         if (Array.isArray(this.resumes[index].audioclip) && this.resumes[index].audioclip.length > 0) {
-          this.resumes[index].audioclip = this.resumes[index].audioclip[0];
+          this.resumes[index].audioclip_url = this.resumes[index].audioclip[0];
         } else {
-          this.resumes[index].audioclip = '';
+          this.resumes[index].audioclip_url = '';
         }
       } catch (error) {
         console.error(error);
