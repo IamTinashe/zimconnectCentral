@@ -5,6 +5,7 @@ const AccountCreated = require('./accountcreated');
 const AccountConfirmed = require('./accountconfirmed');
 const ForgotPassword = require('./forgotpassword');
 const ResetPassword = require('./resetpassword');
+const SendQuote = require('./sendquote');
 
 const transporter = nodemailer.createTransport({
   host: process.env.MAIL_HOST,
@@ -78,6 +79,22 @@ module.exports = class Mail {
       to: user.email,
       subject: 'Your Password Has Successfully Been Reset',
       html: resetPassword.mail(user)
+    }
+
+    await transporter.sendMail(message).then(response => {
+      return response;
+    }).catch(error => {
+      return error;
+    })
+  }
+
+  async sendQuote(user, candidate){
+    let sendQuote = new SendQuote();
+    let message = {
+      from: `Zimconnect <${process.env.EMAIL_USERNAME}>`,
+      to: user.email,
+      subject: 'Quote for your selected candidate',
+      html: sendQuote.mail(user, candidate)
     }
 
     await transporter.sendMail(message).then(response => {

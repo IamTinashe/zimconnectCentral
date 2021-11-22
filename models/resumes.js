@@ -20,7 +20,8 @@ let resumesSchema = new Schema({
   views: Number,
   selectionStatus: Array,
   availability: Boolean,
-  weight: Number
+  weight: Number,
+  value: Number
 });
 
 const Resumes = mongoose.model('resumes', resumesSchema);

@@ -3,7 +3,9 @@ const fs = require('fs');
 const express = require('express');
 const Resumes = require('../services/resumes');
 const ResumesModel = require('../models/resumes');
+const UserModel = require('../models/users');
 const Services = require('../services');
+const Mails = require('../mails');
 
 
 
@@ -175,6 +177,19 @@ const router = express.Router();
 *     skills:
 *      type: object
 *      description: The skills to search for
+*   SelectCandidate:
+*    type: object
+*    required:
+*     - candidateEmail
+*     - userEmail
+*    properties:
+*     candidateEmail:
+*      type: string
+*      description: The candidate's email
+*     userEmail:
+*      type: string
+*      format: email
+*      description: The user's email
 */
 
 
@@ -248,6 +263,7 @@ router.put('/update', async (req, res) => {
     for (index in data) {
       data[index].candidateID = `CAN${index}`;
       data[index].weight = 0;
+      data[index].value = 1800;
       ResumesModel.findOneAndUpdate({ 'email': data[index].email }, { $set: data[index] }, { upsert: true }, (error, response) => {
         if (error) {
           console.error(error);
@@ -284,6 +300,36 @@ router.put('/update', async (req, res) => {
 router.get('/filtered', async (req, res) => {
   try {
     return res.status(200).json(await ResumesModel.find({}));
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
+
+/**
+ * @swagger
+ * /resumes/{email}:
+ *   get:
+ *     tags:
+ *       - Resumes
+ *     description: Gets a resume from zimconnect by email
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Successfully fetched a resume from zimconnect
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Resume'
+ *       500:
+ *         description: Internal Server Error
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/ResumeError'
+ */
+ router.get('/:email', async (req, res) => {
+  try {
+    let user = await ResumesModel.findOne({ email: req.params.email });
+    return res.status(200).json(user);
   } catch (error) {
     return res.status(500).json(error);
   }
@@ -453,6 +499,190 @@ router.post('/skillset', async (req, res) => {
       return res.status(200).json(selectedResumes);
     } else {
       return res.status(404).json({ message: 'No resumes found' });
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
+
+
+
+/**
+ * @swagger
+ * /resumes/select:
+ *   post:
+ *     tags:
+ *       - Resumes
+ *     description: Select candidate
+ *     produces:
+ *       - application/json
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: Resumes object
+ *         required: true
+ *         schema:
+ *          $ref: '#/definitions/SelectCandidate'
+ *     responses:
+ *       201:
+ *         description: Successfully selected candidate
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Resume'
+ *       202:
+ *         description: Partially completed
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/ResumeError'
+ *       401:
+ *         description: Unauthorized
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/ResumeError'
+ *       404:
+ *         description: Candidate not found
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/ResumeError'
+ *       500:
+ *         description: Internal Server Error
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/ResumeError'
+ */
+ router.post('/select', async (req, res) => {
+  let mails = new Mails();
+  try {
+    let candidate = await ResumesModel.findOne({ email: req.body.candidateEmail });
+    let user = await UserModel.findOne({ email: req.body.userEmail });
+    if (candidate && user) {
+      if(candidate.availability == true){
+        candidate.selectionStatus.push({
+          status: true,
+          date: new Date(),
+          user: req.body.userEmail
+        });
+        candidate.views = candidate.views + 1;
+        candidate.availability = false;
+        ResumesModel.findOneAndUpdate({ 'email': candidate.email }, { $set: candidate }, async (error, response) => {
+          if (error) {
+            console.error(error);
+            return res.status(202).json({ message: 'Error occured while updating the candidate profile' });
+          }else{
+            if(user.myCandidates.length == 0){
+              user.myCandidates.push(candidate);
+            }else{
+              let found = false;
+              user.myCandidates.forEach(element => {
+                if(element.email != candidate.email){
+                  user.myCandidates.push(candidate);
+                  found = true;
+                }
+              });
+              if(!found){
+                return res.status(401).json({ message: 'Candidate is already listed' });
+              }
+            }
+            UserModel.findOneAndUpdate({ 'email': user.email }, { $set: user }, async (error, response) => {
+              if (error) {
+                console.error(error);
+                return res.status(202).json({ message: 'Error occured while updating the user profile' });
+              }else{
+                await mails.sendQuote(user, candidate);
+                return res.status(201).json(user);
+              }
+            });
+          }
+        });
+      }else{
+        return res.status(401).json({ message: 'Candidate is already being considered elsewhere' });
+      }
+    }else if(candidate && !user){
+      return res.status(404).json({ message: 'User not found' });
+    }else{
+      return res.status(404).json({ message: 'Candidate not found' });
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
+
+
+
+/**
+ * @swagger
+ * /resumes/removeselected:
+ *   delete:
+ *     tags:
+ *       - Resumes
+ *     description: Remove candidate
+ *     produces:
+ *       - application/json
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: Resumes object
+ *         required: true
+ *         schema:
+ *          $ref: '#/definitions/SelectCandidate'
+ *     responses:
+ *       201:
+ *         description: Successfully removed candidate
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Resume'
+ *       202:
+ *         description: Partially completed
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/ResumeError'
+ *       401:
+ *         description: Unauthorized
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/ResumeError'
+ *       404:
+ *         description: Candidate not found
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/ResumeError'
+ *       500:
+ *         description: Internal Server Error
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/ResumeError'
+ */
+ router.delete('/removeselected', async (req, res) => {
+  try {
+    let candidate = await ResumesModel.findOne({ email: req.body.candidateEmail });
+    let user = await UserModel.findOne({ email: req.body.userEmail });
+    if (candidate && user) {
+      candidate.selectionStatus = candidate.selectionStatus.filter(function(el) { return el.user != req.body.userEmail; });
+      candidate.availability = true;
+      ResumesModel.findOneAndUpdate({ 'email': candidate.email }, { $set: candidate }, async (error, response) => {
+        if (error) {
+          console.error(error);
+          return res.status(202).json({ message: 'Error occured while removing status on the candidate profile' });
+        }else{
+          user.myCandidates = user.myCandidates.filter(function(el) { return el.email != req.body.candidateEmail; });
+          UserModel.findOneAndUpdate({ 'email': user.email }, { $set: user }, async (error, response) => {
+            if (error) {
+              console.error(error);
+              return res.status(202).json({ message: 'Error occured while removing candidate from the user profile' });
+            }else{
+              return res.status(201).json(user);
+            }
+          });
+        }
+      });
+    }else if(candidate && !user){
+      return res.status(404).json({ message: 'User not found' });
+    }else{
+      return res.status(404).json({ message: 'Candidate not found' });
     }
   } catch (error) {
     return res.status(500).json(error);
