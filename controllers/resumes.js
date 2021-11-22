@@ -82,7 +82,7 @@ const router = express.Router();
  *     availability:
  *      type: boolean
  *      description: The availability of the candidate
- *     resumeWeight:
+ *     weight:
  *      type: number
  *      description: The weight of the candidate
  *   ResumeError:
@@ -166,11 +166,15 @@ const router = express.Router();
 *   SearchBySkillset:
 *    type: object
 *    required:
-*     - skill
+*     - skills
+*     - field
 *    properties:
-*     skill:
+*     field:
 *      type: string
-*      description: The skill to search for
+*      description: The field to search for
+*     skills:
+*      type: object
+*      description: The skills to search for
 */
 
 
@@ -243,6 +247,7 @@ router.put('/update', async (req, res) => {
     let index = 0;
     for (index in data) {
       data[index].candidateID = `CAN${index}`;
+      data[index].weight = 0;
       ResumesModel.findOneAndUpdate({ 'email': data[index].email }, { $set: data[index] }, { upsert: true }, (error, response) => {
         if (error) {
           console.error(error);
@@ -374,22 +379,32 @@ router.post('/skillset', async (req, res) => {
   try {
     let resumes = await ResumesModel.find({});
     let selectedResumes = [];
-    let pool = [];
-    if (req.body.skill == 'web') {
-      pool = web.values;
-    } else if (req.body.skill == 'accounting') {
-      pool = accounting.values;
-    } else if (req.body.skill == 'hr') {
-      pool = hr.values;
-    } else if (req.body.skill == 'sales') {
-      pool = sales.values;
-    } else if (req.body.skill == 'marketing') {
-      pool = marketing.values;
+    let pool = [], skillset = [];
+    if (req.body.field == 'web' || req.body.field == 'software') {
+      pool = educationpool.web;
+      skillset = web.values;
+    } else if (req.body.field == 'accounting') {
+      pool = educationpool.accounting;
+      skillset = accounting.values;
+    } else if (req.body.field == 'hr') {
+      pool = educationpool.hr;
+      skillset = hr.values;
+    } else if (req.body.field == 'sales' || req.body.field == 'marketing') {
+      pool = educationpool.marketing;
+      skillset = marketing.values;
     } else {
-      selectedResumes = resumes;
+      pool = educationpool.dental;
     }
+    selectedResumes = resumes.filter(resume => resume.education.map(obj => obj.title.toLowerCase()).some(ai => pool.includes(ai)));
+    selectedResumes.forEach(resume => {
+      let count = resume.skills.map(v => v.toLowerCase()).filter(skills => skillset.map(v => v.toLowerCase()).includes(skills)).length * 10;
+      count = count + (resume.skills.map(v => v.toLowerCase()).filter(skills => req.body.skills.map(v => v.toLowerCase()).includes(skills)).length * 10);
+      count = count + (resume.yearsOfExp * 10);
+      count = count + (resume.education.length * 10);
+      resume.weight = resume.weight + count;
+    });
     //selectedResumes = resumes.filter(object => object.skills.map(name => name.toLowerCase()).some(ai => pool.includes(ai.toLowerCase())));
-    selectedResumes.sort((a, b) => a.yearsOfExp.localeCompare(b.yearsOfExp)).reverse();
+    //selectedResumes.sort((a, b) => a.yearsOfExp.localeCompare(b.yearsOfExp)).reverse();
     if (selectedResumes.length > 0) {
       // let result = selectedResumes.map(a => a.skills);
       // let merged = [].concat.apply([], result);
@@ -410,26 +425,31 @@ router.post('/skillset', async (req, res) => {
       // });
 
 
-      let educationtitles = selectedResumes.map(a => a.education.map(b => b.title));
-      let merged = [].concat.apply([], educationtitles);
-      let newmerged = merged.concat(educationpool.marketing);
-      let words = newmerged.map(v => v.toLowerCase());
-      let uniq = [...new Set(words)];
-      uniq = uniq.map(v => v.toLowerCase());
-      let gen = genericeducation.values.map(v => v.toLowerCase());
-      let resu = uniq.filter(item => !gen.includes(item));
-      let hrRemoved = resu.filter(item => !educationpool.hr.includes(item));
-      let accountingRemoved = hrRemoved.filter(item => !educationpool.accounting.includes(item));
-      let webRemoved = accountingRemoved.filter(item => !educationpool.web.includes(item));
-      let marketingRemoved = webRemoved.filter(item => !educationpool.marketing.includes(item));
-      let salesRemoved = marketingRemoved.filter(item => !educationpool.sales.includes(item));
-      educationpool.dental = salesRemoved;
-      fs.writeFile('./pools/education.json', JSON.stringify(educationpool), 'utf8', error => {
-        if (error) {
-          console.error(error)
-          return
-        }
-      });
+      // let educationtitles = selectedResumes.map(a => a.education.map(b => b.title));
+      // let merged = [].concat.apply([], educationtitles);
+      // let newmerged = merged.concat(educationpool.marketing);
+      // let words = newmerged.map(v => v.toLowerCase());
+      // let uniq = [...new Set(words)];
+      // uniq = uniq.map(v => v.toLowerCase());
+      // let gen = genericeducation.values.map(v => v.toLowerCase());
+      // let resu = uniq.filter(item => !gen.includes(item));
+      // let hrRemoved = resu.filter(item => !educationpool.hr.includes(item));
+      // let accountingRemoved = hrRemoved.filter(item => !educationpool.accounting.includes(item));
+      // let webRemoved = accountingRemoved.filter(item => !educationpool.web.includes(item));
+      // let marketingRemoved = webRemoved.filter(item => !educationpool.marketing.includes(item));
+      // let salesRemoved = marketingRemoved.filter(item => !educationpool.sales.includes(item));
+      // educationpool.dental = salesRemoved;
+      // fs.writeFile('./pools/education.json', JSON.stringify(educationpool), 'utf8', error => {
+      //   if (error) {
+      //     console.error(error)
+      //     return
+      //   }
+      // });
+      try{
+        selectedResumes.sort((a,b) => a.weight - b.weight).reverse();
+      } catch(error){
+        console.log(error);
+      }
       return res.status(200).json(selectedResumes);
     } else {
       return res.status(404).json({ message: 'No resumes found' });

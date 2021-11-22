@@ -88,13 +88,13 @@ module.exports = class Compute {
     for (index in this.resumes) {
       this.resumes[index].yearsOfExp = 0;
       try {
-        if(Array.isArray(this.resumes[index].experience_start) && this.resumes[index].experience_start.length > 0){
-          if(Array.isArray(this.resumes[index].experience_end) && this.resumes[index].experience_end.length > 0){
+        if (Array.isArray(this.resumes[index].experience_start) && this.resumes[index].experience_start.length > 0) {
+          if (Array.isArray(this.resumes[index].experience_end) && this.resumes[index].experience_end.length > 0) {
             let months = 0;
-            while(this.resumes[index].experience_start.length > 0){
+            while (this.resumes[index].experience_start.length > 0) {
               let start = utils.smallestDate(this.resumes[index].experience_start);
               let end = utils.smallestDate(this.resumes[index].experience_end);
-              if(end == null || end == undefined || end == ''){
+              if (end == null || end == undefined || end == '') {
                 end = new Date();
                 end = end.toISOString().slice(0, 10);
               }
@@ -102,7 +102,37 @@ module.exports = class Compute {
               this.resumes[index].experience_end.splice(this.resumes[index].experience_end.indexOf(end), 1)
               months = utils.dateDifference(start, end) + months;
             }
-            this.resumes[index].yearsOfExp = Math.round(months / 12);
+            let years = Math.round(months / 12);
+            let birthday = +new Date(this.resumes[index].dob);
+            let age = ~~((Date.now() - birthday) / (31557600000));
+
+            if (years == 0 && age == 0) {
+              years = 0;
+            } else if (years == 0 && age > 0) {
+              if (age > 22) {
+                years = age - 22;
+              } else {
+                years = 0;
+              }
+            } else if (years > 0 && age == 0) {
+              if (years > 10) {
+                years = 0;
+              } else {
+                years = years;
+              }
+            } else if (years > 0 && age > 0) {
+              if (years > 5 && age <= 22) {
+                years = 0;
+              }else if(years > 13 && age > 0){
+                years = 0;
+              } else {
+                years = years;
+              }
+            } else {
+              years = years;
+            }
+
+            this.resumes[index].yearsOfExp = years;
           }
         }
         delete this.resumes[index].experience_start;
@@ -119,18 +149,18 @@ module.exports = class Compute {
     for (index in this.resumes) {
       try {
         if (typeof this.resumes[index].cv_url === 'object') {
-          if(this.resumes[index].cv_url.length > 0){
-            if(this.resumes[index].cv_url[0].hasOwnProperty('file_url')){
+          if (this.resumes[index].cv_url.length > 0) {
+            if (this.resumes[index].cv_url[0].hasOwnProperty('file_url')) {
               this.resumes[index].cv_url = this.resumes[index].cv_url[0].file_url;
-            }else{
+            } else {
               this.resumes[index].cv_url = '';
             }
-          }else if(Array.isArray(this.resumes[index].cv_url)){
+          } else if (Array.isArray(this.resumes[index].cv_url)) {
             this.resumes[index].cv_url = '';
-          }else{
+          } else {
             this.resumes[index].cv_url = (this.resumes[index].cv_url)[1].file_url;
           }
-        }else{
+        } else {
           this.resumes[index].cv_url = '';
         }
       } catch (error) {
@@ -146,7 +176,7 @@ module.exports = class Compute {
       this.resumes[index].image_url = '';
       try {
         if (typeof this.resumes[index].userimage === 'object') {
-          if(this.resumes[index].userimage.hasOwnProperty('file_url')){
+          if (this.resumes[index].userimage.hasOwnProperty('file_url')) {
             this.resumes[index].image_url = this.resumes[index].userimage.file_url;
           }
         }
@@ -164,7 +194,7 @@ module.exports = class Compute {
       try {
         if (Array.isArray(this.resumes[index].audioclip) && this.resumes[index].audioclip.length > 0) {
           this.resumes[index].audioclip = this.resumes[index].audioclip[0];
-        }else{
+        } else {
           this.resumes[index].audioclip = '';
         }
       } catch (error) {
@@ -185,32 +215,32 @@ module.exports = class Compute {
   }
 
   async formatText() {
-    try{
+    try {
       let index = 0;
       for (index in this.resumes) {
-        if(this.resumes[index].skills.length > 0){
+        if (this.resumes[index].skills.length > 0) {
           let j = 0;
-          for(j in this.resumes[index].skills){
+          for (j in this.resumes[index].skills) {
             this.resumes[index].skills[j] = this.resumes[index].skills[j].replace(/\r?\n?\t/g, '');
           }
         }
 
-        if(this.resumes[index].education.length > 0){
+        if (this.resumes[index].education.length > 0) {
           let k = 0;
-          for(k in this.resumes[index].education){
+          for (k in this.resumes[index].education) {
             this.resumes[index].education[k].description = this.resumes[index].education[k].description.replace(/\r\n?\t/g, ' ');
           }
         }
 
-        if(this.resumes[index].education.length > 0){
+        if (this.resumes[index].education.length > 0) {
           let m = 0;
-          for(m in this.resumes[index].education){
+          for (m in this.resumes[index].education) {
             this.resumes[index].education[m].title = this.resumes[index].education[m].title.replace(/\\/g, '');
           }
         }
       }
       return this.resumes;
-    } catch(error){
+    } catch (error) {
       console.error(error);
     }
   }
