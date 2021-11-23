@@ -258,13 +258,14 @@ router.get('/all', async (req, res) => {
 router.put('/update', async (req, res) => {
   let services = new Services();
   try {
-    let data = await services.compute();
+    let resumes = await services.compute();
     let index = 0;
-    for (index in data) {
-      data[index].candidateID = `CAN${index}`;
-      data[index].weight = 0;
-      data[index].value = 1800;
-      ResumesModel.findOneAndUpdate({ email: data[index].email }, { $set: data[index] }, { upsert: true }, (error, response) => {
+    for (index in resumes) {
+      resumes[index].candidateID = `CAN${index}`;
+      resumes[index].weight = 0;
+      resumes[index].value = 1800;
+      resumes[index].education = resumes[index].education.filter(item => !genericeducation.values.includes(item.title.toLowerCase()));
+      ResumesModel.findOneAndUpdate({ email: resumes[index].email }, { $set: resumes[index] }, { upsert: true }, (error, response) => {
         if (error) {
           console.error(error);
         }
