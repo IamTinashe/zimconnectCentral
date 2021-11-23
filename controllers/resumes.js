@@ -445,7 +445,7 @@ router.post('/skillset', async (req, res) => {
     selectedResumes = resumes.filter(resume => resume.education.map(obj => obj.title.toLowerCase()).some(ai => pool.includes(ai)));
     selectedResumes.forEach(resume => {
       let count = resume.weight;//resume.skills.map(v => v.toLowerCase()).filter(skills => skillset.map(v => v.toLowerCase()).includes(skills)).length * 10;
-      count = count + (resume.skills.map(v => v.toLowerCase()).filter(skills => req.body.skills.map(v => v.toLowerCase()).includes(skills)).length * 25);
+      count = count + (resume.skills.map(v => v.toLowerCase()).filter(skills => req.body.skills.map(v => v.toLowerCase()).includes(skills)).length * 30);
       count = count + (resume.yearsOfExp * 5);
       count = count + (resume.education.length * 10);
       resume.weight = resume.weight + count;
