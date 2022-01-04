@@ -258,15 +258,16 @@ router.get('/all', async (req, res) => {
 router.put('/update', async (req, res) => {
   let services = new Services();
   try {
-    let data = await services.compute();
+    let resumes = await services.compute();
     let index = 0;
-    for (index in data) {
-      data[index].candidateID = `CAN${index}`;
-      data[index].weight = 0;
-      data[index].value = 1800;
-      data[index].availability = true;
-      data[index].views = 0;
-      ResumesModel.findOneAndUpdate({ email: data[index].email }, { $set: data[index] }, { upsert: true }, (error, response) => {
+    for (index in resumes) {
+      resumes[index].candidateID = `CAN${index}`;
+      resumes[index].weight = 0;
+      resumes[index].value = 1800;
+      resumes[index].availability = true;
+      resumes[index].views = 0;
+      resumes[index].education = resumes[index].education.filter(item => !genericeducation.values.includes(item.title.toLowerCase()));
+      ResumesModel.findOneAndUpdate({ email: resumes[index].email }, { $set: resumes[index] }, { upsert: true }, (error, response) => {
         if (error) {
           console.error(error);
         }
@@ -446,7 +447,7 @@ router.post('/skillset', async (req, res) => {
     selectedResumes = resumes.filter(resume => resume.education.map(obj => obj.title.toLowerCase()).some(ai => pool.includes(ai)));
     selectedResumes.forEach(resume => {
       let count = resume.weight;//resume.skills.map(v => v.toLowerCase()).filter(skills => skillset.map(v => v.toLowerCase()).includes(skills)).length * 10;
-      count = count + (resume.skills.map(v => v.toLowerCase()).filter(skills => req.body.skills.map(v => v.toLowerCase()).includes(skills)).length * 25);
+      count = count + (resume.skills.map(v => v.toLowerCase()).filter(skills => req.body.skills.map(v => v.toLowerCase()).includes(skills)).length * 30);
       count = count + (resume.yearsOfExp * 5);
       count = count + (resume.education.length * 10);
       resume.weight = resume.weight + count;
