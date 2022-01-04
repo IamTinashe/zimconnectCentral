@@ -262,10 +262,18 @@ router.put('/update', async (req, res) => {
     let index = 0;
     for (index in resumes) {
       resumes[index].candidateID = `CAN${index}`;
-      resumes[index].weight = 0;
-      resumes[index].value = 1800;
-      resumes[index].availability = true;
-      resumes[index].views = 0;
+      let resume = await ResumesModel.findOne({ email: resumes[index].email });
+      if (resume) {
+        resumes[index].weight = resume.weight;
+        resumes[index].value = resume.value;
+        resumes[index].availability = resume.availability;
+        resumes[index].views = resume.views;
+      }else {
+        resumes[index].weight = 0;
+        resumes[index].value = 1800;
+        resumes[index].availability = true;
+        resumes[index].views = 0;
+      }
       resumes[index].education = resumes[index].education.filter(item => !genericeducation.values.includes(item.title.toLowerCase()));
       ResumesModel.findOneAndUpdate({ email: resumes[index].email }, { $set: resumes[index] }, { upsert: true }, (error, response) => {
         if (error) {
