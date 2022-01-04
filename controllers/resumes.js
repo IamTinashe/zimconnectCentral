@@ -597,13 +597,15 @@ router.post('/skillset', async (req, res) => {
               user.myCandidates.push(candidate);
             }else{
               let found = false;
+              let candid = {};
               user.myCandidates.forEach(element => {
                 if(element.email != candidate.email){
-                  user.myCandidates.push(candidate);
+                  candid = candidate;
                   found = true;
                 }
               });
               if(!found){
+                user.myCandidates.push(candid);
                 return res.status(401).json({ message: 'Candidate is already listed' });
               }
             }
