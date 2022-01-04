@@ -605,8 +605,9 @@ router.post('/skillset', async (req, res) => {
                 }
               });
               if(!found){
-                user.myCandidates.push(candid);
                 return res.status(401).json({ message: 'Candidate is already listed' });
+              }else{
+                user.myCandidates.push(candid);
               }
             }
             UserModel.findOneAndUpdate({ 'email': user.email }, { $set: user }, async (error, response) => {
