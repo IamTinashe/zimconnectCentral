@@ -190,6 +190,15 @@ const router = express.Router();
 *      type: string
 *      format: email
 *      description: The user's email
+*   ResumeViewCount:
+*    type: object
+*    required:
+*     - candidateEmail
+*    properties:
+*     candidateEmail:
+*      type: string
+*      description: The candidate's email
+*      format: email
 */
 
 
@@ -282,6 +291,49 @@ router.put('/update', async (req, res) => {
       });
     }
     return res.status(201).json({ message: 'Successfully updated all resumes' });
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
+
+/**
+ * @swagger
+ * /resumes/updateviewcount:
+ *   put:
+ *     tags:
+ *       - Resumes
+ *     description: Updates View Count of Resume
+ *     produces:
+ *       - application/json
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: Resumes object
+ *         required: true
+ *         schema:
+ *          $ref: '#/definitions/ResumeViewCount'
+ *     responses:
+ *       201:
+ *         description: Successfully updated all resumes from Zimbojobs to Zimconnect
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Resume'
+ *       500:
+ *         description: Internal Server Error
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/ResumeError'
+ */
+ router.put('/updateviewcount', async (req, res) => {
+  try {
+    ResumesModel.findOneAndUpdate({ email: req.body.candidateEmail }, {$inc: { views: 1 }}, (error, response) => {
+      if (error) {
+        console.error(error);
+      }
+    });
+    return res.status(201).json({ message: 'Increased View Count' });
   } catch (error) {
     return res.status(500).json(error);
   }
@@ -454,55 +506,14 @@ router.post('/skillset', async (req, res) => {
     }
     selectedResumes = resumes.filter(resume => resume.education.map(obj => obj.title.toLowerCase()).some(ai => pool.includes(ai)));
     selectedResumes.forEach(resume => {
-      let count = resume.weight;//resume.skills.map(v => v.toLowerCase()).filter(skills => skillset.map(v => v.toLowerCase()).includes(skills)).length * 10;
+      let count = resume.weight;
       count = count + (resume.skills.map(v => v.toLowerCase()).filter(skills => req.body.skills.map(v => v.toLowerCase()).includes(skills)).length * 30);
       count = count + (resume.yearsOfExp * 5);
       count = count + (resume.education.length * 10);
       resume.weight = resume.weight + count;
     });
-    //selectedResumes = resumes.filter(object => object.skills.map(name => name.toLowerCase()).some(ai => pool.includes(ai.toLowerCase())));
-    //selectedResumes.sort((a, b) => a.yearsOfExp.localeCompare(b.yearsOfExp)).reverse();
     if (selectedResumes.length > 0) {
-      // let result = selectedResumes.map(a => a.skills);
-      // let merged = [].concat.apply([], result);
-      // let newmerged = merged.concat(web.values);
-      // let words = newmerged.map(v => v.toLowerCase());
-      // let uniq = [...new Set(words)];
-      // uniq = uniq.map(v => v.toLowerCase());
-      // let gen = generic.values.map(v => v.toLowerCase());
-      // let resu = uniq.filter(item => !gen.includes(item));
-      // let values = {
-      //   "values": resu
-      // }
-      // fs.writeFile('./pools/marketing.json', JSON.stringify(values), 'utf8', error => {
-      //   if (error) {
-      //     console.error(error)
-      //     return
-      //   }
-      // });
-
-
-      // let educationtitles = selectedResumes.map(a => a.education.map(b => b.title));
-      // let merged = [].concat.apply([], educationtitles);
-      // let newmerged = merged.concat(educationpool.marketing);
-      // let words = newmerged.map(v => v.toLowerCase());
-      // let uniq = [...new Set(words)];
-      // uniq = uniq.map(v => v.toLowerCase());
-      // let gen = genericeducation.values.map(v => v.toLowerCase());
-      // let resu = uniq.filter(item => !gen.includes(item));
-      // let hrRemoved = resu.filter(item => !educationpool.hr.includes(item));
-      // let accountingRemoved = hrRemoved.filter(item => !educationpool.accounting.includes(item));
-      // let webRemoved = accountingRemoved.filter(item => !educationpool.web.includes(item));
-      // let marketingRemoved = webRemoved.filter(item => !educationpool.marketing.includes(item));
-      // let salesRemoved = marketingRemoved.filter(item => !educationpool.sales.includes(item));
-      // educationpool.dental = salesRemoved;
-      // fs.writeFile('./pools/education.json', JSON.stringify(educationpool), 'utf8', error => {
-      //   if (error) {
-      //     console.error(error)
-      //     return
-      //   }
-      // });
-      try{
+      try {
         selectedResumes.sort((a,b) => a.weight - b.weight).reverse();
       } catch(error){
         console.log(error);
