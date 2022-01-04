@@ -683,6 +683,7 @@ router.post('/skillset', async (req, res) => {
  */
  router.delete('/removeselected', async (req, res) => {
   try {
+    console.log(req.body);
     let candidate = await ResumesModel.findOne({ email: req.body.candidateEmail });
     let user = await UserModel.findOne({ email: req.body.userEmail });
     if (candidate && user) {
