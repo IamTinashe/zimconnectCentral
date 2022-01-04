@@ -264,6 +264,8 @@ router.put('/update', async (req, res) => {
       data[index].candidateID = `CAN${index}`;
       data[index].weight = 0;
       data[index].value = 1800;
+      data[index].availability = true;
+      data[index].views = 0;
       ResumesModel.findOneAndUpdate({ email: data[index].email }, { $set: data[index] }, { upsert: true }, (error, response) => {
         if (error) {
           console.error(error);
