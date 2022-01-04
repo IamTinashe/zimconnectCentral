@@ -590,7 +590,6 @@ router.post('/skillset', async (req, res) => {
         candidate.availability = false;
         ResumesModel.findOneAndUpdate({ 'email': candidate.email }, { $set: candidate }, async (error, response) => {
           if (error) {
-            console.error(error);
             return res.status(202).json({ message: 'Error occured while updating the candidate profile' });
           }else{
             if(user.myCandidates.length == 0){
@@ -683,7 +682,6 @@ router.post('/skillset', async (req, res) => {
  */
  router.delete('/removeselected', async (req, res) => {
   try {
-    console.log(req.body);
     let candidate = await ResumesModel.findOne({ email: req.body.candidateEmail });
     let user = await UserModel.findOne({ email: req.body.userEmail });
     if (candidate && user) {
@@ -691,13 +689,11 @@ router.post('/skillset', async (req, res) => {
       candidate.availability = true;
       ResumesModel.findOneAndUpdate({ 'email': candidate.email }, { $set: candidate }, async (error, response) => {
         if (error) {
-          console.error(error);
           return res.status(202).json({ message: 'Error occured while removing status on the candidate profile' });
         }else{
           user.myCandidates = user.myCandidates.filter(function(el) { return el.email != req.body.candidateEmail; });
           UserModel.findOneAndUpdate({ 'email': user.email }, { $set: user }, async (error, response) => {
             if (error) {
-              console.error(error);
               return res.status(202).json({ message: 'Error occured while removing candidate from the user profile' });
             }else{
               return res.status(201).json(user);
