@@ -598,8 +598,9 @@ router.post('/skillset', async (req, res) => {
               let candid = {};
               user.myCandidates.forEach(element => {
                 if(element.email == candidate.email){
-                  candid = candidate;
                   found = true;
+                }else{
+                  candid = candidate;
                 }
               });
               if(found){
