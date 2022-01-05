@@ -531,7 +531,7 @@ router.post('/skillset', async (req, res) => {
 
 /**
  * @swagger
- * /resumes/select:
+ * /resumes/shortlist:
  *   post:
  *     tags:
  *       - Resumes
@@ -574,7 +574,7 @@ router.post('/skillset', async (req, res) => {
  *          type: object
  *          $ref: '#/components/schemas/ResumeError'
  */
- router.post('/select', async (req, res) => {
+ router.post('/shortlist', async (req, res) => {
   let mails = new Mails();
   try {
     let candidate = await ResumesModel.findOne({ email: req.body.candidateEmail });
@@ -587,7 +587,6 @@ router.post('/skillset', async (req, res) => {
           user: req.body.userEmail
         });
         candidate.views = candidate.views + 1;
-        candidate.availability = false;
         ResumesModel.findOneAndUpdate({ 'email': candidate.email }, { $set: candidate }, async (error, response) => {
           if (error) {
             return res.status(202).json({ message: 'Error occured while updating the candidate profile' });
@@ -637,7 +636,7 @@ router.post('/skillset', async (req, res) => {
 
 /**
  * @swagger
- * /resumes/removeselected:
+ * /resumes/removeshortlist:
  *   delete:
  *     tags:
  *       - Resumes
@@ -680,7 +679,7 @@ router.post('/skillset', async (req, res) => {
  *          type: object
  *          $ref: '#/components/schemas/ResumeError'
  */
- router.delete('/removeselected', async (req, res) => {
+ router.delete('/removeshortlist', async (req, res) => {
   try {
     let candidate = await ResumesModel.findOne({ email: req.body.candidateEmail });
     let user = await UserModel.findOne({ email: req.body.userEmail });
