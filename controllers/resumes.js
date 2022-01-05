@@ -96,6 +96,11 @@ const router = express.Router();
  *     status:
  *      type: number
  *      description: Status code
+ *   Response:
+ *    type: object 
+ *    properties:
+ *     message:
+ *      type: string
  */
 
 
@@ -196,6 +201,15 @@ const router = express.Router();
 *     - candidateEmail
 *    properties:
 *     candidateEmail:
+*      type: string
+*      description: The candidate's email
+*      format: email
+*   DeleteResume:
+*    type: object
+*    required:
+*     - email
+*    properties:
+*     email:
 *      type: string
 *      description: The candidate's email
 *      format: email
@@ -712,7 +726,52 @@ router.post('/skillset', async (req, res) => {
   }
 });
 
-// router.delete('/delete', async (req, res) => {
+
+/**
+ * @swagger
+ * /resumes/delete:
+ *   delete:
+ *     tags:
+ *       - Resumes
+ *     description: Remove Resume
+ *     produces:
+ *       - application/json
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: Resumes object
+ *         required: true
+ *         schema:
+ *          $ref: '#/definitions/DeleteResume'
+ *     responses:
+ *       201:
+ *         description: Successfully deleted resume
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Response'
+ *       500:
+ *         description: Internal Server Error
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/ResumeError'
+ */
+router.delete('/delete', async (req, res) => {
+  try{
+    await ResumesModel.deleteOne({ email: req.body.email }, async (error, response) => {
+      if (error) {
+        return res.status(401).json(error);
+      }else {
+        return res.status(201).json({ message: 'Successfully deleted candidate' });
+      }
+    }).clone();
+  }catch(error){
+    return res.status(500).json(error);
+  }
+});
+
+// router.delete('/deleteall', async (req, res) => {
 //   try {
 //     await ResumesModel.deleteMany();
 //     return res.status(200).json({ message: 'Successfully deleted all resumes' });
