@@ -3,7 +3,7 @@
 module.exports = class SendQuote {
   constructor() { }
 
-  mail(user, candidate) {
+  mail(user, candidateList) {
     return `<!doctype html>
     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml"
       xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -620,7 +620,7 @@ module.exports = class SendQuote {
     
                                     <p dir="ltr">Hello ${user.fullname}
                                       <br><br>
-                                      Here is your quote for ${candidate.fullname}.
+                                      Here is your quote for ${candidateList}.
                                     <br><br>
                                     Best Regards,<br>
                                     ZimConnect Team</p>

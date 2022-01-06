@@ -213,6 +213,20 @@ const router = express.Router();
 *      type: string
 *      description: The candidate's email
 *      format: email
+*   SelectCandidates:
+*    type: object
+*    required:
+*     - user
+*     - candidates
+*    properties:
+*     user:
+*      type: string
+*      description: The user's email
+*      format: email
+*     candidates:
+*      type: object
+*      description: Arraylist of candidate Emails
+*      format: array
 */
 
 
@@ -549,7 +563,7 @@ router.post('/skillset', async (req, res) => {
  *   post:
  *     tags:
  *       - Resumes
- *     description: Select candidate
+ *     description: Shortlist candidate
  *     produces:
  *       - application/json
  *     consumes:
@@ -589,7 +603,6 @@ router.post('/skillset', async (req, res) => {
  *          $ref: '#/components/schemas/ResumeError'
  */
  router.post('/shortlist', async (req, res) => {
-  let mails = new Mails();
   try {
     let candidate = await ResumesModel.findOne({ email: req.body.candidateEmail });
     let user = await UserModel.findOne({ email: req.body.userEmail });
@@ -629,7 +642,6 @@ router.post('/skillset', async (req, res) => {
                 console.error(error);
                 return res.status(202).json({ message: 'Error occured while updating the user profile' });
               }else{
-                await mails.sendQuote(user, candidate);
                 return res.status(201).json(user);
               }
             });
@@ -656,7 +668,7 @@ router.post('/skillset', async (req, res) => {
  *   delete:
  *     tags:
  *       - Resumes
- *     description: Remove candidate
+ *     description: Remove shortlisted candidate
  *     produces:
  *       - application/json
  *     consumes:
@@ -723,6 +735,102 @@ router.post('/skillset', async (req, res) => {
     }
   } catch (error) {
     return res.status(500).json(error);
+  }
+});
+
+/**
+ * @swagger
+ * /resumes/select:
+ *   post:
+ *     tags:
+ *       - Resumes
+ *     description: Select candidates and send Quote
+ *     produces:
+ *       - application/json
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: Resumes object
+ *         required: true
+ *         schema:
+ *          $ref: '#/definitions/SelectCandidates'
+ *     responses:
+ *       201:
+ *         description: Successfully selected candidate
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/User'
+ *       202:
+ *         description: Partially completed
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/ResumeError'
+ *       401:
+ *         description: Unauthorized
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/ResumeError'
+ *       404:
+ *         description: Candidate not found
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/ResumeError'
+ *       500:
+ *         description: Internal Server Error
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/ResumeError'
+ */
+ router.post('/select', async (req, res) => {
+  let mails = new Mails();
+  let candidateList = req.body.candidates;
+  let user = {email: req.body.user}
+  let errorGlobal = { status: false, code: 0 };
+  let errorList = []
+  candidateList.forEach(async element => {
+    try{
+      let candidate = await ResumesModel.findOne({ email: element });
+      user = await UserModel.findOne({ email: user.email });
+      if (candidate && user) {
+        candidate.availability = false;
+        ResumesModel.findOneAndUpdate({ 'email': candidate.email }, { $set: candidate }, async (error, response) => {
+          if (error) {
+            errorGlobal.status = true;
+            errorList.push({ message: error });
+          } else {
+            for(let index in user.myCandidates){
+              if(user.myCandidates[index].email == candidate.email){
+                user.myCandidates[index].availability = false;
+              }
+            }
+            UserModel.findOneAndUpdate({ 'email': user.email }, { $set: user }, async (error, response) => {
+              if (error) {
+                errorGlobal.status = true;
+                errorList.push({ message: error });
+              }
+            });
+          }
+        });
+      }else if(candidate && !user){
+        errorGlobal.status = true;
+        errorList.push({ message: user + ' Could not be found' })
+      }else{
+        errorGlobal.status = true;
+        errorList.push({ message: candidate + ' Could not be found' })
+      }
+    } catch(error) {
+      errorGlobal.status = true;
+      errorGlobal.code = 500
+    }
+  });
+
+  if(errorGlobal.status == true){
+    return res.status(errorGlobal.code).json({ message: errorList});
+  } else {
+    await mails.sendQuote(user, candidateList);
+    return res.status(201).json(user);
   }
 });
 
