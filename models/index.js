@@ -125,7 +125,7 @@ module.exports = class Models {
           user.myCandidates.forEach(async element => {
             let candidate = await Resumes.findOne({ email: element.email });
             if (candidate != null) {
-              candidate.selectionStatus = candidate.selectionStatus.filter(function(el) { return el.user != body.email; });
+              candidate.selectionStatus = candidate.selectionStatus.filter(function(el) { return el.user == body.email; });
               Resumes.findOneAndUpdate({ 'email': candidate.email }, { $set: candidate }, async (error, response) => {
                 if (error) {
                   return { user: user, message: 'Could not update candidate' }
