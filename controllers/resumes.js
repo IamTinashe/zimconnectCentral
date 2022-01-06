@@ -867,13 +867,25 @@ router.post('/skillset', async (req, res) => {
  */
 router.delete('/delete', async (req, res) => {
   try{
-    await ResumesModel.deleteOne({ email: req.body.email }, async (error, response) => {
-      if (error) {
-        return res.status(401).json(error);
-      }else {
-        return res.status(201).json({ message: 'Successfully deleted candidate' });
-      }
-    }).clone();
+    let candidateEmail = req.body.email;
+    let candidate = await ResumesModel.findOne({ email: candidateEmail });
+    candidate.selectionStatus.forEach(async element => {
+      let user = await UserModel.findOne({ email: element.user });
+      user.myCandidates = user.myCandidates.filter(value => value.email != candidateEmail);
+      UserModel.findOneAndUpdate({ 'email': user.email }, { $set: user }, async (error, response) => {
+        if (error) {
+          console.error(error);
+        }
+      }).clone().then(async () =>{
+        await ResumesModel.deleteOne({ email: candidateEmail }, async (error, response) => {
+          if (error) {
+            return res.status(401).json(error);
+          }else {
+            return res.status(201).json({ message: 'Successfully deleted candidate' });
+          }
+        }).clone();
+      });
+    });
   }catch(error){
     return res.status(500).json(error);
   }
