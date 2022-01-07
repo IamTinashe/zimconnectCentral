@@ -785,14 +785,15 @@ router.post('/skillset', async (req, res) => {
  */
  router.post('/select', async (req, res) => {
   let mails = new Mails();
-  let candidateList = req.body.candidates;
+  let candidateList = [];
   let user = {email: req.body.user}
   let errorGlobal = { status: false, code: 0 };
   let errorList = []
-  candidateList.forEach(async element => {
+  user = await UserModel.findOne({ email: user.email });
+  req.body.candidates.forEach(async element => {
     try{
       let candidate = await ResumesModel.findOne({ email: element });
-      user = await UserModel.findOne({ email: user.email });
+      candidateList.push(candidate);
       if (candidate && user) {
         candidate.availability = false;
         ResumesModel.findOneAndUpdate({ 'email': candidate.email }, { $set: candidate }, async (error, response) => {
