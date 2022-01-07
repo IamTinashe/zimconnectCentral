@@ -618,9 +618,30 @@ module.exports = class SendQuote {
                                   <td valign="top" class="mcnTextContent" style="padding-top:0; padding-right:18px;
                                         padding-bottom:9px; padding-left:18px;">
     
-                                    <p dir="ltr">Hello ${user.fullname}
+                                    <p dir="ltr">Hello ${user}
                                       <br><br>
-                                      Here is your quote for ${candidateList}.
+                                      Here is your quote for the ${candidateList.lenght} candidates that you selected.
+                                    <br><br>
+                                    <table border="1" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width:100%;">
+                                      <tbody class="mcnTextBlockOuter">
+                                        <tr>
+                                          <td valign="top" class="mcnTextContent">
+                                            Number Of Candidates
+                                          </td>
+                                          <td valign="top" class="mcnTextContent">
+                                            Amount
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td valign="top" class="mcnTextContent">
+                                            ${candidateList.lenght}
+                                          </td>
+                                          <td valign="top" class="mcnTextContent">
+                                            $ ${candidateList.lenght * 1800}
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
                                     <br><br>
                                     Best Regards,<br>
                                     ZimConnect Team</p>
