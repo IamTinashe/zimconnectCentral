@@ -87,6 +87,12 @@ const router = express.Router();
  *     weight:
  *      type: number
  *      description: The weight of the candidate
+ *     minSalary:
+ *      type: number
+ *      description: minimum salary
+ *     maxSalary:
+ *      type: number
+ *      description: maximum salary
  *   ResumeError:
  *    type: object 
  *    properties:
@@ -195,6 +201,22 @@ const router = express.Router();
 *      type: string
 *      format: email
 *      description: The user's email
+*   AdvancedSearch:
+*    type: object
+*    required:
+*     - skills
+*     - field
+*     - salary
+*    properties:
+*     skills:
+*      type: object
+*      description: The skills to search for
+*     field:
+*      type: object
+*      description: The field to search for
+*     salary:
+*      type: object
+*      description: The salary range to search for
 *   ResumeViewCount:
 *    type: object
 *    required:
@@ -312,6 +334,36 @@ router.put('/update', async (req, res) => {
         resumes[index].views = 0;
       }
       resumes[index].education = resumes[index].education.filter(item => !genericeducation.values.includes(item.title.toLowerCase()));
+      if(resumes[index].salary != "." && resumes[index].salary != "Negotiable" && resumes[index].salary != "n/a" && resumes[index].salary != "NA"  && resumes[index].salary != "N/A" && resumes[index].salary != "" && resumes[index].salary != ", " && resumes[index].salary != " ," && resumes[index].salary != "," && resumes[index].salary != "-" && resumes[index].salary != "000," && resumes[index].salary != ",00") {
+        resumes[index].salary = resumes[index].salary.replace(/,/g, '');
+        resumes[index].salary = parseInt(resumes[index].salary);
+        if(resumes[index].salary > 10000){
+          resumes[index].salary = resumes[index].salary/100
+        }else if(resumes[index].salary > 3000 && resumes[index].salary <= 10000){
+          resumes[index].salary = resumes[index].salary/2
+        }else if(resumes[index].salary <= 3){
+          resumes[index].salary = resumes[index].salary * 1000
+        }else if(resumes[index].salary > 3 && resumes[index].salary < 9){
+          resumes[index].salary = resumes[index].salary * 100
+        }
+
+        resumes[index].minSalary = parseInt((resumes[index].salary*100)/75);
+        resumes[index].maxSalary = parseInt((resumes[index].salary*100)/55);
+      }else{
+        resumes[index].minSalary = parseInt((1000*100)/75);
+        resumes[index].maxSalary = parseInt((1000*100)/55);
+      }
+
+      if(resumes[index].education.length > 0){
+        resumes[index].minSalary = ((resumes[index].education.length/10)*resumes[index].minSalary) + resumes[index].minSalary
+        resumes[index].maxSalary = ((resumes[index].education.length/10)*resumes[index].maxSalary) + resumes[index].maxSalary
+      }
+      if(resumes[index].yearsOfExp > 0){
+        resumes[index].minSalary = ((resumes[index].yearsOfExp/10)*resumes[index].minSalary) + resumes[index].minSalary
+        resumes[index].maxSalary = ((resumes[index].yearsOfExp/10)*resumes[index].maxSalary) + resumes[index].maxSalary
+      }
+      resumes[index].minSalary = Math.round(resumes[index].minSalary/100)*100;
+      resumes[index].maxSalary = Math.round(resumes[index].maxSalary/100)*100;
       ResumesModel.findOneAndUpdate({ email: resumes[index].email }, { $set: resumes[index] }, { upsert: true }, (error, response) => {
         if (error) {
           console.error(error);
@@ -476,6 +528,87 @@ router.post('/search', async (req, res) => {
     return res.status(500).json(error);
   }
 });
+
+
+/**
+ * @swagger
+ * /resumes/advancedsearch:
+ *   post:
+ *     tags:
+ *       - Resumes
+ *     description: Search for resumes
+ *     produces:
+ *       - application/json
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: Resumes object
+ *         required: true
+ *         schema:
+ *          $ref: '#/definitions/AdvancedSearch'
+ *     responses:
+ *       200:
+ *         description: Successfully fetched all resumes from zimconnect that match the search criteria
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/Resume'
+ *       404:
+ *         description: No resumes found
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/ResumeError'
+ *       500:
+ *         description: Internal Server Error
+ *         schema:
+ *          type: object
+ *          $ref: '#/components/schemas/ResumeError'
+ */
+ router.post('/advancedsearch', async (req, res) => {
+  try {
+    let resumes = await ResumesModel.find({});
+    let selectedResumes = [];
+    let pool = [], skillset = [];
+    if (req.body.field == 'web' || req.body.field == 'software') {
+      pool = educationpool.web;
+      skillset = web.values;
+    } else if (req.body.field == 'accounting') {
+      pool = educationpool.accounting;
+      skillset = accounting.values;
+    } else if (req.body.field == 'hr') {
+      pool = educationpool.hr;
+      skillset = hr.values;
+    } else if (req.body.field == 'sales' || req.body.field == 'marketing') {
+      pool = educationpool.marketing;
+      skillset = marketing.values;
+    } else {
+      pool = educationpool.dental;
+    }
+    selectedResumes = resumes.filter(resume => resume.education.map(obj => obj.title.toLowerCase()).some(ai => pool.includes(ai)));
+    selectedResumes.forEach(resume => {
+      let count = resume.weight;
+      count = count + (resume.skills.map(v => v.toLowerCase()).filter(skills => req.body.skills.map(v => v.toLowerCase()).includes(skills)).length * 30);
+      count = count + (resume.yearsOfExp * 5);
+      count = count + (resume.education.length * 10);
+      resume.weight = resume.weight + count;
+    });
+    if (selectedResumes.length > 0) {
+      try {
+        selectedResumes.sort((a,b) => a.weight - b.weight).reverse();
+      } catch(error){
+        console.log(error);
+      }
+      return res.status(200).json(selectedResumes);
+    } else {
+      return res.status(404).json({ message: 'No resumes found' });
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+});
+
+
 
 /**
  * @swagger
