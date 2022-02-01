@@ -206,7 +206,8 @@ const router = express.Router();
 *    required:
 *     - skills
 *     - field
-*     - salary
+*     - maxBudget
+*     - minBudget
 *    properties:
 *     skills:
 *      type: object
@@ -214,9 +215,12 @@ const router = express.Router();
 *     field:
 *      type: object
 *      description: The field to search for
-*     salary:
-*      type: object
-*      description: The salary range to search for
+*     maxBudget:
+*      type: number
+*      description: max Budget
+*     minBudget:
+*      type: number
+*      description: min Budget
 *   ResumeViewCount:
 *    type: object
 *    required:
@@ -594,6 +598,10 @@ router.post('/search', async (req, res) => {
       resume.weight = resume.weight + count;
     });
     if (selectedResumes.length > 0) {
+      if(req.body.maxBudget > 0){
+        selectedResumes = selectedResumes.filter( resume =>  parseInt(resume.minSalary) >= req.body.minBudget);
+        selectedResumes = selectedResumes.filter( resume =>  parseInt(resume.maxSalary) <= req.body.maxBudget && parseInt(resume.minSalary) <= req.body.maxBudget);
+      }
       try {
         selectedResumes.sort((a,b) => a.weight - b.weight).reverse();
       } catch(error){
