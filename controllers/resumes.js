@@ -208,6 +208,8 @@ const router = express.Router();
 *     - field
 *     - maxBudget
 *     - minBudget
+*     - minYears
+*     - maxYears
 *    properties:
 *     skills:
 *      type: object
@@ -221,6 +223,12 @@ const router = express.Router();
 *     minBudget:
 *      type: number
 *      description: min Budget
+*     minYears:
+*      type: number
+*      description: min Years of Experience
+*     maxYears:
+*      type: number
+*      description: max Years of Experience
 *   ResumeViewCount:
 *    type: object
 *    required:
@@ -589,6 +597,11 @@ router.post('/search', async (req, res) => {
     } else {
       pool = educationpool.dental;
     }
+    if(req.body.search.length > 0){
+      pool= [];
+      pool = pool.concat(educationpool.web,educationpool.accounting,educationpool.hr,educationpool.marketing,educationpool.dental);
+      pool = pool.filter(item => item.toLowerCase().includes(req.body.search.toLowerCase()));
+    }
     selectedResumes = resumes.filter(resume => resume.education.map(obj => obj.title.toLowerCase()).some(ai => pool.includes(ai)));
     selectedResumes.forEach(resume => {
       let count = resume.weight;
@@ -601,6 +614,11 @@ router.post('/search', async (req, res) => {
       if(req.body.maxBudget > 0){
         selectedResumes = selectedResumes.filter( resume =>  parseInt(resume.minSalary) >= req.body.minBudget);
         selectedResumes = selectedResumes.filter( resume =>  parseInt(resume.maxSalary) <= req.body.maxBudget && parseInt(resume.minSalary) <= req.body.maxBudget);
+      }
+      if(req.body.maxYears > 0 && req.body.minYears == 0){
+        selectedResumes = selectedResumes.filter( resume =>  parseInt(resume.yearsOfExp) <= req.body.maxYears);
+      }else if(req.body.minYears > 0 && req.body.maxYears > 0){
+        selectedResumes = selectedResumes.filter( resume =>  parseInt(resume.yearsOfExp) >= req.body.minYears && parseInt(resume.yearsOfExp) <= req.body.maxYears);
       }
       try {
         selectedResumes.sort((a,b) => a.weight - b.weight).reverse();
