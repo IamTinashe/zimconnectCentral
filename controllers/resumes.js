@@ -210,6 +210,7 @@ const router = express.Router();
 *     - minBudget
 *     - minYears
 *     - maxYears
+*     - search
 *    properties:
 *     skills:
 *      type: object
@@ -229,6 +230,9 @@ const router = express.Router();
 *     maxYears:
 *      type: number
 *      description: max Years of Experience
+*     search:
+*      type: string
+*      description: The search string
 *   ResumeViewCount:
 *    type: object
 *    required:
@@ -339,43 +343,43 @@ router.put('/update', async (req, res) => {
         resumes[index].value = resume.value;
         resumes[index].availability = resume.availability;
         resumes[index].views = resume.views;
-      }else {
+      } else {
         resumes[index].weight = 0;
         resumes[index].value = 1800;
         resumes[index].availability = true;
         resumes[index].views = 0;
       }
       resumes[index].education = resumes[index].education.filter(item => !genericeducation.values.includes(item.title.toLowerCase()));
-      if(resumes[index].salary != "." && resumes[index].salary != "Negotiable" && resumes[index].salary != "n/a" && resumes[index].salary != "NA"  && resumes[index].salary != "N/A" && resumes[index].salary != "" && resumes[index].salary != ", " && resumes[index].salary != " ," && resumes[index].salary != "," && resumes[index].salary != "-" && resumes[index].salary != "000," && resumes[index].salary != ",00") {
+      if (resumes[index].salary != "." && resumes[index].salary != "Negotiable" && resumes[index].salary != "n/a" && resumes[index].salary != "NA" && resumes[index].salary != "N/A" && resumes[index].salary != "" && resumes[index].salary != ", " && resumes[index].salary != " ," && resumes[index].salary != "," && resumes[index].salary != "-" && resumes[index].salary != "000," && resumes[index].salary != ",00") {
         resumes[index].salary = resumes[index].salary.replace(/,/g, '');
         resumes[index].salary = parseInt(resumes[index].salary);
-        if(resumes[index].salary > 10000){
-          resumes[index].salary = resumes[index].salary/100
-        }else if(resumes[index].salary > 3000 && resumes[index].salary <= 10000){
-          resumes[index].salary = resumes[index].salary/2
-        }else if(resumes[index].salary <= 3){
+        if (resumes[index].salary > 10000) {
+          resumes[index].salary = resumes[index].salary / 100
+        } else if (resumes[index].salary > 3000 && resumes[index].salary <= 10000) {
+          resumes[index].salary = resumes[index].salary / 2
+        } else if (resumes[index].salary <= 3) {
           resumes[index].salary = resumes[index].salary * 1000
-        }else if(resumes[index].salary > 3 && resumes[index].salary < 9){
+        } else if (resumes[index].salary > 3 && resumes[index].salary < 9) {
           resumes[index].salary = resumes[index].salary * 100
         }
 
-        resumes[index].minSalary = parseInt((resumes[index].salary*100)/75);
-        resumes[index].maxSalary = parseInt((resumes[index].salary*100)/55);
-      }else{
-        resumes[index].minSalary = parseInt((1000*100)/75);
-        resumes[index].maxSalary = parseInt((1000*100)/55);
+        resumes[index].minSalary = parseInt((resumes[index].salary * 100) / 75);
+        resumes[index].maxSalary = parseInt((resumes[index].salary * 100) / 55);
+      } else {
+        resumes[index].minSalary = parseInt((1000 * 100) / 75);
+        resumes[index].maxSalary = parseInt((1000 * 100) / 55);
       }
 
-      if(resumes[index].education.length > 0){
-        resumes[index].minSalary = ((resumes[index].education.length/10)*resumes[index].minSalary) + resumes[index].minSalary
-        resumes[index].maxSalary = ((resumes[index].education.length/10)*resumes[index].maxSalary) + resumes[index].maxSalary
+      if (resumes[index].education.length > 0) {
+        resumes[index].minSalary = ((resumes[index].education.length / 10) * resumes[index].minSalary) + resumes[index].minSalary
+        resumes[index].maxSalary = ((resumes[index].education.length / 10) * resumes[index].maxSalary) + resumes[index].maxSalary
       }
-      if(resumes[index].yearsOfExp > 0){
-        resumes[index].minSalary = ((resumes[index].yearsOfExp/10)*resumes[index].minSalary) + resumes[index].minSalary
-        resumes[index].maxSalary = ((resumes[index].yearsOfExp/10)*resumes[index].maxSalary) + resumes[index].maxSalary
+      if (resumes[index].yearsOfExp > 0) {
+        resumes[index].minSalary = ((resumes[index].yearsOfExp / 10) * resumes[index].minSalary) + resumes[index].minSalary
+        resumes[index].maxSalary = ((resumes[index].yearsOfExp / 10) * resumes[index].maxSalary) + resumes[index].maxSalary
       }
-      resumes[index].minSalary = Math.round(resumes[index].minSalary/100)*100;
-      resumes[index].maxSalary = Math.round(resumes[index].maxSalary/100)*100;
+      resumes[index].minSalary = Math.round(resumes[index].minSalary / 100) * 100;
+      resumes[index].maxSalary = Math.round(resumes[index].maxSalary / 100) * 100;
       ResumesModel.findOneAndUpdate({ email: resumes[index].email }, { $set: resumes[index] }, { upsert: true }, (error, response) => {
         if (error) {
           console.error(error);
@@ -418,9 +422,9 @@ router.put('/update', async (req, res) => {
  *          type: object
  *          $ref: '#/components/schemas/ResumeError'
  */
- router.put('/updateviewcount', async (req, res) => {
+router.put('/updateviewcount', async (req, res) => {
   try {
-    ResumesModel.findOneAndUpdate({ email: req.body.candidateEmail }, {$inc: { views: 1 }}, (error, response) => {
+    ResumesModel.findOneAndUpdate({ email: req.body.candidateEmail }, { $inc: { views: 1 } }, (error, response) => {
       if (error) {
         console.error(error);
       }
@@ -481,7 +485,7 @@ router.get('/filtered', async (req, res) => {
  *          type: object
  *          $ref: '#/components/schemas/ResumeError'
  */
- router.get('/:email', async (req, res) => {
+router.get('/:email', async (req, res) => {
   try {
     let user = await ResumesModel.findOne({ email: req.params.email });
     return res.status(200).json(user);
@@ -577,7 +581,7 @@ router.post('/search', async (req, res) => {
  *          type: object
  *          $ref: '#/components/schemas/ResumeError'
  */
- router.post('/advancedsearch', async (req, res) => {
+router.post('/advancedsearch', async (req, res) => {
   try {
     let resumes = await ResumesModel.find({});
     let selectedResumes = [];
@@ -597,12 +601,19 @@ router.post('/search', async (req, res) => {
     } else {
       pool = educationpool.dental;
     }
-    if(req.body.search.length > 0){
-      pool= [];
-      pool = pool.concat(educationpool.web,educationpool.accounting,educationpool.hr,educationpool.marketing,educationpool.dental);
+    if (req.body.search.length > 0) {
+      pool = [];
+      pool = pool.concat(educationpool.web, educationpool.accounting, educationpool.hr, educationpool.marketing, educationpool.dental);
       pool = pool.filter(item => item.toLowerCase().includes(req.body.search.toLowerCase()));
+      selectedResumes = resumes.filter(resume => resume.education.map(obj => obj.title.toLowerCase()).some(ai => pool.includes(ai))
+        || resume.education.map(obj => obj.title.toLowerCase()).includes(req.body.search.toLowerCase())
+        || resume.education.map(obj => obj.description.toLowerCase()).includes(req.body.search.toLowerCase())
+        || resume.skills.map(name => name.toLowerCase()).includes(req.body.search.toLowerCase())
+        || resume.profession.toLowerCase().includes(req.body.search.toLowerCase())
+      );
+    } else {
+      selectedResumes = resumes.filter(resume => resume.education.map(obj => obj.title.toLowerCase()).some(ai => pool.includes(ai)));
     }
-    selectedResumes = resumes.filter(resume => resume.education.map(obj => obj.title.toLowerCase()).some(ai => pool.includes(ai)));
     selectedResumes.forEach(resume => {
       let count = resume.weight;
       count = count + (resume.skills.map(v => v.toLowerCase()).filter(skills => req.body.skills.map(v => v.toLowerCase()).includes(skills)).length * 30);
@@ -611,18 +622,18 @@ router.post('/search', async (req, res) => {
       resume.weight = resume.weight + count;
     });
     if (selectedResumes.length > 0) {
-      if(req.body.maxBudget > 0){
-        selectedResumes = selectedResumes.filter( resume =>  parseInt(resume.minSalary) >= req.body.minBudget);
-        selectedResumes = selectedResumes.filter( resume =>  parseInt(resume.maxSalary) <= req.body.maxBudget && parseInt(resume.minSalary) <= req.body.maxBudget);
+      if (req.body.maxBudget > 0) {
+        selectedResumes = selectedResumes.filter(resume => parseInt(resume.minSalary) >= req.body.minBudget);
+        selectedResumes = selectedResumes.filter(resume => parseInt(resume.maxSalary) <= req.body.maxBudget && parseInt(resume.minSalary) <= req.body.maxBudget);
       }
-      if(req.body.maxYears > 0 && req.body.minYears == 0){
-        selectedResumes = selectedResumes.filter( resume =>  parseInt(resume.yearsOfExp) <= req.body.maxYears);
-      }else if(req.body.minYears > 0 && req.body.maxYears > 0){
-        selectedResumes = selectedResumes.filter( resume =>  parseInt(resume.yearsOfExp) >= req.body.minYears && parseInt(resume.yearsOfExp) <= req.body.maxYears);
+      if (req.body.maxYears > 0 && req.body.minYears == 0) {
+        selectedResumes = selectedResumes.filter(resume => parseInt(resume.yearsOfExp) <= req.body.maxYears);
+      } else if (req.body.minYears > 0 && req.body.maxYears > 0) {
+        selectedResumes = selectedResumes.filter(resume => parseInt(resume.yearsOfExp) >= req.body.minYears && parseInt(resume.yearsOfExp) <= req.body.maxYears);
       }
       try {
-        selectedResumes.sort((a,b) => a.weight - b.weight).reverse();
-      } catch(error){
+        selectedResumes.sort((a, b) => a.weight - b.weight).reverse();
+      } catch (error) {
         console.log(error);
       }
       return res.status(200).json(selectedResumes);
@@ -701,8 +712,8 @@ router.post('/skillset', async (req, res) => {
     });
     if (selectedResumes.length > 0) {
       try {
-        selectedResumes.sort((a,b) => a.weight - b.weight).reverse();
-      } catch(error){
+        selectedResumes.sort((a, b) => a.weight - b.weight).reverse();
+      } catch (error) {
         console.log(error);
       }
       return res.status(200).json(selectedResumes);
@@ -761,12 +772,12 @@ router.post('/skillset', async (req, res) => {
  *          type: object
  *          $ref: '#/components/schemas/ResumeError'
  */
- router.post('/shortlist', async (req, res) => {
+router.post('/shortlist', async (req, res) => {
   try {
     let candidate = await ResumesModel.findOne({ email: req.body.candidateEmail });
     let user = await UserModel.findOne({ email: req.body.userEmail });
     if (candidate && user) {
-      if(candidate.availability == true){
+      if (candidate.availability == true) {
         candidate.selectionStatus.push({
           status: true,
           date: new Date(),
@@ -776,22 +787,22 @@ router.post('/skillset', async (req, res) => {
         ResumesModel.findOneAndUpdate({ 'email': candidate.email }, { $set: candidate }, async (error, response) => {
           if (error) {
             return res.status(202).json({ message: 'Error occured while updating the candidate profile' });
-          }else{
-            if(user.myCandidates.length == 0){
+          } else {
+            if (user.myCandidates.length == 0) {
               user.myCandidates.push(candidate);
-            }else{
+            } else {
               let found = false;
               let candid = {};
               user.myCandidates.forEach(element => {
-                if(element.email == candidate.email){
+                if (element.email == candidate.email) {
                   found = true;
-                }else{
+                } else {
                   candid = candidate;
                 }
               });
-              if(found){
+              if (found) {
                 return res.status(401).json({ message: 'Candidate is already listed' });
-              }else{
+              } else {
                 user.myCandidates.push(candid);
                 user.myCandidates = user.myCandidates.filter(value => Object.keys(value).length !== 0);
               }
@@ -800,18 +811,18 @@ router.post('/skillset', async (req, res) => {
               if (error) {
                 console.error(error);
                 return res.status(202).json({ message: 'Error occured while updating the user profile' });
-              }else{
+              } else {
                 return res.status(201).json(user);
               }
             });
           }
         });
-      }else{
+      } else {
         return res.status(401).json({ message: 'Candidate is already being considered elsewhere' });
       }
-    }else if(candidate && !user){
+    } else if (candidate && !user) {
       return res.status(404).json({ message: 'User not found' });
-    }else{
+    } else {
       return res.status(404).json({ message: 'Candidate not found' });
     }
   } catch (error) {
@@ -866,30 +877,30 @@ router.post('/skillset', async (req, res) => {
  *          type: object
  *          $ref: '#/components/schemas/ResumeError'
  */
- router.delete('/removeshortlist', async (req, res) => {
+router.delete('/removeshortlist', async (req, res) => {
   try {
     let candidate = await ResumesModel.findOne({ email: req.body.candidateEmail });
     let user = await UserModel.findOne({ email: req.body.userEmail });
     if (candidate && user) {
-      candidate.selectionStatus = candidate.selectionStatus.filter(function(el) { return el.user != req.body.userEmail; });
+      candidate.selectionStatus = candidate.selectionStatus.filter(function (el) { return el.user != req.body.userEmail; });
       candidate.availability = true;
       ResumesModel.findOneAndUpdate({ 'email': candidate.email }, { $set: candidate }, async (error, response) => {
         if (error) {
           return res.status(202).json({ message: 'Error occured while removing status on the candidate profile' });
-        }else{
-          user.myCandidates = user.myCandidates.filter(function(el) { return el.email != req.body.candidateEmail; });
+        } else {
+          user.myCandidates = user.myCandidates.filter(function (el) { return el.email != req.body.candidateEmail; });
           UserModel.findOneAndUpdate({ 'email': user.email }, { $set: user }, async (error, response) => {
             if (error) {
               return res.status(202).json({ message: 'Error occured while removing candidate from the user profile' });
-            }else{
+            } else {
               return res.status(201).json(user);
             }
           });
         }
       });
-    }else if(candidate && !user){
+    } else if (candidate && !user) {
       return res.status(404).json({ message: 'User not found' });
-    }else{
+    } else {
       return res.status(404).json({ message: 'Candidate not found' });
     }
   } catch (error) {
@@ -942,15 +953,15 @@ router.post('/skillset', async (req, res) => {
  *          type: object
  *          $ref: '#/components/schemas/ResumeError'
  */
- router.post('/select', async (req, res) => {
+router.post('/select', async (req, res) => {
   let mails = new Mails();
   let candidateList = req.body.candidates;
-  let user = {email: req.body.user}
+  let user = { email: req.body.user }
   let errorGlobal = { status: false, code: 0 };
   let errorList = []
   user = await UserModel.findOne({ email: user.email });
   candidateList.forEach(async element => {
-    try{
+    try {
       let candidate = await ResumesModel.findOne({ email: element });
       if (candidate && user) {
         candidate.availability = false;
@@ -959,8 +970,8 @@ router.post('/skillset', async (req, res) => {
             errorGlobal.status = true;
             errorList.push({ message: error });
           } else {
-            for(let index in user.myCandidates){
-              if(user.myCandidates[index].email == candidate.email){
+            for (let index in user.myCandidates) {
+              if (user.myCandidates[index].email == candidate.email) {
                 user.myCandidates[index].availability = false;
               }
             }
@@ -972,21 +983,21 @@ router.post('/skillset', async (req, res) => {
             });
           }
         });
-      }else if(candidate && !user){
+      } else if (candidate && !user) {
         errorGlobal.status = true;
         errorList.push({ message: user + ' Could not be found' })
-      }else{
+      } else {
         errorGlobal.status = true;
         errorList.push({ message: candidate + ' Could not be found' })
       }
-    } catch(error) {
+    } catch (error) {
       errorGlobal.status = true;
       errorGlobal.code = 500
     }
   });
 
-  if(errorGlobal.status == true){
-    return res.status(errorGlobal.code).json({ message: errorList});
+  if (errorGlobal.status == true) {
+    return res.status(errorGlobal.code).json({ message: errorList });
   } else {
     await mails.sendQuote(user, candidateList);
     return res.status(201).json(user);
@@ -1025,7 +1036,7 @@ router.post('/skillset', async (req, res) => {
  *          $ref: '#/components/schemas/ResumeError'
  */
 router.delete('/delete', async (req, res) => {
-  try{
+  try {
     let candidateEmail = req.body.email;
     let candidate = await ResumesModel.findOne({ email: candidateEmail });
     candidate.selectionStatus.forEach(async element => {
@@ -1035,17 +1046,17 @@ router.delete('/delete', async (req, res) => {
         if (error) {
           console.error(error);
         }
-      }).clone().then(async () =>{
+      }).clone().then(async () => {
         await ResumesModel.deleteOne({ email: candidateEmail }, async (error, response) => {
           if (error) {
             return res.status(401).json(error);
-          }else {
+          } else {
             return res.status(201).json({ message: 'Successfully deleted candidate' });
           }
         }).clone();
       });
     });
-  }catch(error){
+  } catch (error) {
     return res.status(500).json(error);
   }
 });
