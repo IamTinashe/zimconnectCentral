@@ -610,6 +610,7 @@ router.post('/advancedsearch', async (req, res) => {
         || resume.education.map(obj => obj.description.toLowerCase()).includes(req.body.search.toLowerCase())
         || resume.skills.map(name => name.toLowerCase()).includes(req.body.search.toLowerCase())
         || resume.profession.toLowerCase().includes(req.body.search.toLowerCase())
+        || resume.skills.filter(word => word.toLowerCase().includes(req.body.search.toLowerCase())).length > 0
       );
     } else {
       selectedResumes = resumes.filter(resume => resume.education.map(obj => obj.title.toLowerCase()).some(ai => pool.includes(ai)));
