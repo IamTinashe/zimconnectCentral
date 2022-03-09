@@ -12,7 +12,7 @@ module.exports = class Created {
       <meta charset="UTF-8">
       <meta http-equiv="X-UA-Compatible" content="IE=edge">
       <meta name="viewport" content="width=device-width, initial-scale=1">
-      <title>Your Zimconnect Account Has Successfully Been Created</title>
+      <title>Your WorXconnect Account Has Successfully Been Created</title>
     
       <style type="text/css">
         p {
@@ -563,7 +563,7 @@ module.exports = class Created {
     
     <body style="color: #000000;">
       <span class="mcnPreviewText" style="display:none; font-size:0px; line-height:0px;
-        max-height:0px; max-width:0px; opacity:0; overflow:hidden; visibility:hidden; mso-hide:all;">Your Zimconnect Account Has Successfully Been Created</span>
+        max-height:0px; max-width:0px; opacity:0; overflow:hidden; visibility:hidden; mso-hide:all;">Your WorXconnect Account Has Successfully Been Created</span>
       <center>
         <table align="center" border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable">
           <tr>
@@ -620,7 +620,7 @@ module.exports = class Created {
     
                                     <p dir="ltr">Hello ${user.fullname}
                                       <br><br>
-                                      Thank you for signing up with Zimconnect. Your account has successfully been
+                                      Thank you for signing up with WorXconnect. Your account has successfully been
                                       created<br><br><br>
                                       Please confirm your email by clicking the button below and entering the confirmation
                                       code <strong>${user.confirmationCode}</strong><br>
@@ -632,7 +632,7 @@ module.exports = class Created {
                                     </div>
                                     <br><br>
                                     Best Regards,<br>
-                                    ZimConnect Team</p>
+                                    WorXconnect Team</p>
                                   </td>
                                 </tr>
                               </tbody>

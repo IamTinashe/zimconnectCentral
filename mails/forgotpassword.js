@@ -632,7 +632,7 @@ module.exports = class Forgot {
                                     </div>
                                     <br>
                                     Best Regards,<br>
-                                    ZimConnect Team</p>
+                                    WorXconnect Team</p>
                                   </td>
                                 </tr>
                               </tbody>

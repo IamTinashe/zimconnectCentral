@@ -623,7 +623,7 @@ module.exports = class ResetPassword {
                                       Your password was successfully changed.
                                     <br><br>
                                     Best Regards,<br>
-                                    ZimConnect Team</p>
+                                    WorXconnect Team</p>
                                   </td>
                                 </tr>
                               </tbody>

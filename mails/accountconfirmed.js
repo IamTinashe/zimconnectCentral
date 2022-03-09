@@ -623,7 +623,7 @@ module.exports = class Confirmed {
                                       You have successfully confirmed your email address.
                                     <br><br>
                                     Best Regards,<br>
-                                    ZimConnect Team</p>
+                                    WorXconnect Team</p>
                                   </td>
                                 </tr>
                               </tbody>

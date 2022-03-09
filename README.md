@@ -9,5 +9,5 @@ DB_USERNAME=admin
 
 MAIL_HOST=smtp.gmail.com
 MAIL_PORT=587
-EMAIL_USERNAME=noreply@zimconnect.org
+EMAIL_USERNAME=noreply@worxconnect.com
 MAIL_PASSWORD=global2019!

@@ -8,11 +8,11 @@ const swaggerOptions = {
   swaggerDefinition: {
     components: {},
     info: {
-      title: 'Zimconnect Endpoints',
+      title: 'WorXconnect Endpoints',
       version: '1.0.0',
       contact: {
         name: "API Support",
-        url: "https://www.zimconnect.org/contact",
+        url: "https://www.worxconnect.com/contact",
         email: "tinashe.zvihwati@zimworx.com",
       },
     }
@@ -20,7 +20,7 @@ const swaggerOptions = {
   servers: [
     {
       url: "http://localhost:3000",
-      description: "Zimconnect API Documentation",
+      description: "WorXconnect API Documentation",
     },
   ],
   apis: ['./controllers/health.js', './controllers/users.js', './controllers/resumes.js', './controllers/auth.js',],

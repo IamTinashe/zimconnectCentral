@@ -644,7 +644,7 @@ module.exports = class SendQuote {
                                     </table>
                                     <br><br>
                                     Best Regards,<br>
-                                    ZimConnect Team</p>
+                                    WorXconnect Team</p>
                                   </td>
                                 </tr>
                               </tbody>

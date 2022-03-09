@@ -279,7 +279,7 @@ const router = express.Router();
  *       - application/json
  *     responses:
  *       200:
- *         description: Successfully updated all resumes from Zimbojobs to Zimconnect
+ *         description: Successfully updated all resumes from Zimbojobs to WorXconnect
  *         schema:
  *          type: object
  *          $ref: '#/definitions/ZimbojobsResume'
@@ -306,7 +306,7 @@ router.get('/all', async (req, res) => {
  *   put:
  *     tags:
  *       - Resumes
- *     description: Manually update all resumes from Zimbojobs to Zimconnect
+ *     description: Manually update all resumes from Zimbojobs to WorXconnect
  *     produces:
  *       - application/json
  *     consumes:
@@ -320,7 +320,7 @@ router.get('/all', async (req, res) => {
  *          $ref: '#/definitions/ZimbojobsResume'
  *     responses:
  *       201:
- *         description: Successfully updated all resumes from Zimbojobs to Zimconnect
+ *         description: Successfully updated all resumes from Zimbojobs to WorXconnect
  *         schema:
  *          type: object
  *          $ref: '#/components/schemas/Resume'
@@ -412,7 +412,7 @@ router.put('/update', async (req, res) => {
  *          $ref: '#/definitions/ResumeViewCount'
  *     responses:
  *       201:
- *         description: Successfully updated all resumes from Zimbojobs to Zimconnect
+ *         description: Successfully updated all resumes from Zimbojobs to WorXconnect
  *         schema:
  *          type: object
  *          $ref: '#/components/schemas/Resume'
@@ -470,7 +470,7 @@ router.get('/filtered', async (req, res) => {
  *   get:
  *     tags:
  *       - Resumes
- *     description: Gets a resume from zimconnect by email
+ *     description: Gets a resume from worxconnect by email
  *     produces:
  *       - application/json
  *     responses:
@@ -515,7 +515,7 @@ router.get('/:email', async (req, res) => {
  *          $ref: '#/definitions/SearchResume'
  *     responses:
  *       200:
- *         description: Successfully fetched all resumes from zimconnect that match the search criteria
+ *         description: Successfully fetched all resumes from worxconnect that match the search criteria
  *         schema:
  *          type: object
  *          $ref: '#/components/schemas/Resume'
@@ -566,7 +566,7 @@ router.post('/search', async (req, res) => {
  *          $ref: '#/definitions/AdvancedSearch'
  *     responses:
  *       200:
- *         description: Successfully fetched all resumes from zimconnect that match the search criteria
+ *         description: Successfully fetched all resumes from worxconnect that match the search criteria
  *         schema:
  *          type: object
  *          $ref: '#/components/schemas/Resume'
@@ -668,7 +668,7 @@ router.post('/advancedsearch', async (req, res) => {
  *          $ref: '#/definitions/SearchBySkillset'
  *     responses:
  *       200:
- *         description: Successfully fetched all resumes from zimconnect that match the search criteria
+ *         description: Successfully fetched all resumes from worxconnect that match the search criteria
  *         schema:
  *          type: object
  *          $ref: '#/components/schemas/Resume'
