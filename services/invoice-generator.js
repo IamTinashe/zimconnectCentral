@@ -10,27 +10,9 @@ var options = {
   border: "10mm",
 };
 
-const orders = [
-  {
-    order: 1,
-    fullname: "Tinashe Zvihwati",
-    value: "3000",
-  },
-  {
-    order: 2,
-    fullname: "Tinotenda Zvihwati",
-    value: "4000",
-  },
-  {
-    order: 3,
-    fullname: "Tawananyasha Zvihwati",
-    value: "6000",
-  },
-];
-
 
 module.exports = class InvoiceGenerator {
-  generatePdf(user, candidateList) {
+  generatePdf(user, orders) {
     console.log(candidateList);
     let document = {
       html: html,
