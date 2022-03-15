@@ -28,16 +28,9 @@ const orders = [
   },
 ];
 
-const user = {
-  fullname: "Tinashe Zvihwati",
-  email: "tinashe.zvihwati@zimworx.com",
-  total: "10000"
-}
-
 
 module.exports = class InvoiceGenerator {
   generatePdf(user, candidateList) {
-    console.log(user);
     console.log(candidateList);
     let document = {
       html: html,
