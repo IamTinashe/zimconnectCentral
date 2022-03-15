@@ -365,7 +365,7 @@ router.post('/login', async (req, res) => {
  *          $ref: '#/components/schemas/Error'
  */
  router.put('/reset', async (req, res) => {
-   console.log("hello");
+   console.log(req.body);
   let models = new Models();
   let mails = new Mails();
   try {
