@@ -108,7 +108,7 @@ module.exports = class Created {
                       <td align="center" valign="top" style="padding:0;Margin:0;width:700px"> 
                        <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px"> 
                          <tr> 
-                          <td align="center" style="padding:0;Margin:0;font-size:0px"><img src="https://worxconnect.com/images/sign-up.jpg" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="700"></td> 
+                          <td align="center" style="padding:0;Margin:0;font-size:0px"><img src="${process.env.FRONTEND_URL}/images/sign-up.jpg" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="700"></td> 
                          </tr> 
                        </table></td> 
                      </tr> 
