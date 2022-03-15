@@ -13,6 +13,8 @@ var options = {
 
 module.exports = class InvoiceGenerator {
   async generatePdf(user, orders) {
+    let user = user;
+    let orders = orders;
     let document = {
       html: html,
       data: {
@@ -21,10 +23,13 @@ module.exports = class InvoiceGenerator {
       path: "./invoices/output.pdf",
       type: "",
     };
-    pdf.create(document, options).then((res) => { console.log(res); }).catch((error) => {
-      console.error(error);
+    return new Promise(async (resolve, reject) => {
+      try {
+        let response = await pdf.create(document, options);
+        resolve(response);
+      } catch (error) {
+        reject(error);
+      }
     });
-
-    return "output.pdf"
   }
 }
