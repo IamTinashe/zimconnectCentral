@@ -12,11 +12,7 @@ var options = {
 
 
 module.exports = class InvoiceGenerator {
-  async generatePdf(u, orders) {
-    let user = {
-      fullname: "Tina",
-      email: "t@t.com"
-    }
+  async generatePdf(user, orders) {
     let document = {
       html: html,
       data: {
