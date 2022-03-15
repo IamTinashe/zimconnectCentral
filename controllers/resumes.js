@@ -6,6 +6,7 @@ const ResumesModel = require('../models/resumes');
 const UserModel = require('../models/users');
 const Services = require('../services');
 const Mails = require('../mails');
+const PDF = require('../services/invoice-generator');
 
 
 
@@ -955,6 +956,7 @@ router.delete('/removeshortlist', async (req, res) => {
  *          $ref: '#/components/schemas/ResumeError'
  */
 router.post('/select', async (req, res) => {
+  let pdf = new PDF();
   let mails = new Mails();
   let candidateList = req.body.candidates;
   let user = { email: req.body.user }
@@ -1000,7 +1002,8 @@ router.post('/select', async (req, res) => {
   if (errorGlobal.status == true) {
     return res.status(errorGlobal.code).json({ message: errorList });
   } else {
-    await mails.sendQuote(user, candidateList);
+    let file = await pdf.generatePdf(user, candidateList);
+    await mails.sendQuote(user, candidateList, file);
     return res.status(201).json(user);
   }
 });

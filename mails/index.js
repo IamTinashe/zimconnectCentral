@@ -88,13 +88,18 @@ module.exports = class Mail {
     })
   }
 
-  async sendQuote(user, candidate){
+  async sendQuote(user, candidate, file){
     let sendQuote = new SendQuote();
     let message = {
       from: `WorXconnect <${process.env.EMAIL_USERNAME}>`,
       to: user.email,
-      subject: 'Quote for your selected candidate',
-      html: sendQuote.mail(user, candidate)
+      subject: 'Quote for your selected candidates',
+      html: sendQuote.mail(user, candidate),
+      attachments: [{
+        filename: file,
+        path: '../invoices/output.pdf',
+        contentType: 'application/pdf'
+      }]
     }
 
     await transporter.sendMail(message).then(response => {
