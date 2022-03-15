@@ -12,8 +12,11 @@ var options = {
 
 
 module.exports = class InvoiceGenerator {
-  async generatePdf(user, orders) {
-    console.log(user)
+  async generatePdf(u, orders) {
+    let user = {
+      fullname: "Tina",
+      email: "t@t.com"
+    }
     let document = {
       html: html,
       data: {
@@ -22,8 +25,6 @@ module.exports = class InvoiceGenerator {
       path: "./invoices/output.pdf",
       type: "",
     };
-
-    console.log(document);
     pdf.create(document, options).then((res) => { console.log(res); }).catch((error) => {
       console.error(error);
     });
