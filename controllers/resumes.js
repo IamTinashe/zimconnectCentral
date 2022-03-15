@@ -1003,7 +1003,7 @@ router.post('/select', async (req, res) => {
     return res.status(errorGlobal.code).json({ message: errorList });
   } else {
     let file = await pdf.generatePdf(user, candidateList);
-    console.log(file)
+    console.log("File->" + file + "<-")
     await mails.sendQuote(user, candidateList, "output.pdf");
     return res.status(201).json(user);
   }
