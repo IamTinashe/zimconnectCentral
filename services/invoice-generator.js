@@ -12,8 +12,7 @@ var options = {
 
 
 module.exports = class InvoiceGenerator {
-  generatePdf(user, orders) {
-    console.log(candidateList);
+  async generatePdf(user, orders) {
     let document = {
       html: html,
       data: {
