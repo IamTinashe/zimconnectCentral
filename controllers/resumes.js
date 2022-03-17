@@ -1004,7 +1004,7 @@ router.post('/select', async (req, res) => {
   } else {
     let file = await pdf.generatePdf(user, candidateList);
     console.log("File->" + file + "<-")
-    await mails.sendQuote(user, candidateList, "output.pdf");
+    await mails.sendQuote(user, candidateList, "quote.pdf");
     return res.status(201).json(user);
   }
 });

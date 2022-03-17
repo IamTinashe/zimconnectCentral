@@ -97,7 +97,7 @@ module.exports = class Mail {
       html: sendQuote.mail(user, candidate),
       attachments: [{
         filename: file,
-        path: './invoices/output.pdf',
+        path: './invoices/quote.pdf',
         contentType: 'application/pdf'
       }]
     }

@@ -19,7 +19,7 @@ module.exports = class InvoiceGenerator {
       data: {
         orders, user,
       },
-      path: "./invoices/output.pdf",
+      path: "./invoices/quote.pdf",
       type: "",
     };
     return new Promise(async (resolve, reject) => {
