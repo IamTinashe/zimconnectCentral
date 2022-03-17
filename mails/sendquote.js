@@ -121,11 +121,11 @@ module.exports = class SendQuote {
                       <td align="center" valign="top" style="padding:0;Margin:0;width:660px"> 
                        <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px"> 
                          <tr> 
-                          <td align="left" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:Montserrat, sans-serif;line-height:24px;color:#333333;font-size:16px">Hi ${user.fullname}<br><br>Attached is a quotation with the list of candidates that you selected.&nbsp;</p> <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:Montserrat, sans-serif;line-height:24px;color:#333333;font-size:16px">To view your quote click below.&nbsp; An alert has been sent to the sales team and the candidates.</p></td> 
+                          <td align="left" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:Montserrat, sans-serif;line-height:24px;color:#333333;font-size:16px">Hi ${user.fullname}<br><br>Attached is a quotation with the list of candidates that you selected.&nbsp;</p> <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:Montserrat, sans-serif;line-height:24px;color:#333333;font-size:16px">An alert has been sent to the sales team and the candidates.</p></td> 
                          </tr> 
-                         <tr> 
+                         <!--<tr> 
                           <td align="center" style="padding:0;Margin:0;padding-top:15px"><span class="es-button-border" style="border-style:solid;border-color:#2CB543 #2CB543 #A32E00 #A32E00;background:#4d5c6a;border-width:0px 0px 4px 4px;display:block;border-radius:10px;width:auto;border-left-color:#45bda0;border-bottom-color:#45bda0;border-left-width:2px;border-bottom-width:2px;border-right-width:2px;border-right-color:#45bda0"><a href="${process.env.FRONTEND_URL}/login" class="es-button es-button-1" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:18px;border-style:solid;border-color:#4d5c6a;border-width:15px 5px;display:block;background:#4d5c6a;border-radius:10px;font-family:Montserrat, sans-serif;font-weight:bold;font-style:normal;line-height:22px;width:auto;text-align:center" target="_blank">VIEW Quote</a></span></td> 
-                         </tr> 
+                         </tr> -->
                        </table></td> 
                      </tr> 
                    </table></td> 
