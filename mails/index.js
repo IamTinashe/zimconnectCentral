@@ -97,7 +97,7 @@ module.exports = class Mail {
       html: sendQuote.mail(user, candidate),
       attachments: [{
         filename: file,
-        path: '/var/www/html/zimconnectCentral/invoices/output.pdf',
+        path: './invoices/output.pdf',
         contentType: 'application/pdf'
       }]
     }
