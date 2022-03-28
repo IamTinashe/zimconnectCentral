@@ -108,4 +108,19 @@ module.exports = class Mail {
       return error;
     })
   }
+
+  async sendContactEmail(emailObj){
+    let message = {
+      from: `WorXconnect <${process.env.EMAIL_USERNAME}>`,
+      to: "tinashe.zvihwati@zimworx.com",
+      subject: `Contact Message from ${emailObj.name}`,
+      html: `Name: ${emailObj.name}<br>Email: ${emailObj.email}<br>Message: ${emailObj.message}`
+    }
+
+    await transporter.sendMail(message).then(response => {
+      return response;
+    }).catch(error => {
+      return error;
+    })
+  }
 }
